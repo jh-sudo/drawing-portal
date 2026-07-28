@@ -468,7 +468,10 @@ function drawPipes(pdf: jsPDF, pipes: PipeElementType[]): void {
   for (const pipe of pipes) {
     const dx = pipe.endX - pipe.startX;
     const dy = pipe.endY - pipe.startY;
-    if (Math.abs(dx) < 1 && Math.abs(dy) < 1) continue; // matches PipeElement.tsx zero-length skip
+    // A near-zero-length pipe has nothing meaningful to draw in a static export —
+    // unlike the live canvas (PipeElement.tsx), there's no "keep it grabbable so
+    // the user can pull it apart" concern here, so it's simply skipped.
+    if (Math.abs(dx) < 1 && Math.abs(dy) < 1) continue;
 
     const { color, strokeWidth } = getPipeDrawStyle(pipe.pipeType, false, pipe.customColor);
     const segments = buildJumpSegments(pipe.startX, pipe.startY, pipe.endX, pipe.endY, pipeJumps.get(pipe.id) ?? [], PIPE_JUMP_RADIUS_PX);

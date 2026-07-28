@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import json
 
+from fastapi.datastructures import UploadFile
 from fastapi.testclient import TestClient
 
 from app.main import app
@@ -91,3 +92,37 @@ def test_oversized_schematic_image_rejected():
     oversized = b"x" * (MAX_UPLOAD_SIZE + 1)
     r = _post(m, files={"schematic_image": ("big.jpg", oversized, "image/jpeg")})
     assert r.status_code == 413
+
+
+def test_negative_canvas_width_px_returns_422_not_corrupted_annotation():
+    """Regression: a negative width_px passed the numeric-type check and the
+    `or 1200` fallback (only catches falsy values, not negatives), reaching
+    image_annotator with a canvas_width that silently corrupts marker scaling
+    instead of failing cleanly."""
+    m = meta([])
+    m["canvas"] = {"width_px": -50, "height_px": 800}
+    r = _post(m)
+    assert r.status_code == 422
+
+
+def test_canvas_width_px_zero_returns_422():
+    m = meta([])
+    m["canvas"] = {"width_px": 0, "height_px": 800}
+    r = _post(m)
+    assert r.status_code == 422
+
+
+def test_image_read_failure_degrades_gracefully_not_500(monkeypatch):
+    """Regression: moving the image read outside the annotation try/except (so
+    check_upload_size's 413 could propagate) also meant any other read failure
+    -- e.g. a truncated upload -- became an uncaught 500 instead of a 200 with
+    annotation simply skipped."""
+    async def broken_read(self, size: int = -1):
+        raise RuntimeError("simulated truncated upload")
+
+    monkeypatch.setattr(UploadFile, "read", broken_read)
+
+    m = meta([el("h1", "water_heater", backflow_requirement="check_valve")])
+    r = _post(m, files={"schematic_image": ("photo.jpg", b"fake-bytes", "image/jpeg")})
+    assert r.status_code == 200
+    assert r.json()["annotated_image_b64"] is None

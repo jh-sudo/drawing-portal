@@ -64,8 +64,11 @@ def _validate_metadata(metadata: dict) -> None:
         raise HTTPException(status_code=422, detail="metadata.canvas must be an object.")
     for field in ("width_px", "height_px"):
         value = canvas.get(field)
-        if value is not None and not isinstance(value, (int, float)):
-            raise HTTPException(status_code=422, detail=f"metadata.canvas.{field} must be a number.")
+        if value is not None:
+            if not isinstance(value, (int, float)):
+                raise HTTPException(status_code=422, detail=f"metadata.canvas.{field} must be a number.")
+            if value <= 0:
+                raise HTTPException(status_code=422, detail=f"metadata.canvas.{field} must be positive.")
 
 
 # ---------------------------------------------------------------------------
@@ -132,34 +135,43 @@ async def evaluate_schematic(
     annotated_image_b64: str | None = None
 
     if schematic_image is not None and check1.elements_of_interest:
-        image_bytes = await schematic_image.read()
-        check_upload_size(image_bytes, "schematic_image")
-
         try:
-            # Resolve canvas coordinates for each element of interest
-            elem_by_id = {e["id"]: e for e in elements}
-            annotated_elements: list[dict] = []
-            for item in check1.elements_of_interest:
-                el = elem_by_id.get(item["element_id"])
-                if el:
-                    pos = el.get("position", {})
-                    annotated_elements.append({
-                        "canvas_x": pos.get("canvas_x", 0),
-                        "canvas_y": pos.get("canvas_y", 0),
-                        "label": item["label"],
-                        "color": item["color"],
-                    })
-
-            if annotated_elements:
-                annotated_image_b64 = annotate_schematic(
-                    image_bytes=image_bytes,
-                    annotated_elements=annotated_elements,
-                    canvas_width=canvas_w,
-                    canvas_height=canvas_h,
-                )
+            image_bytes: bytes | None = await schematic_image.read()
         except Exception:
-            # Annotation failure is non-fatal — log and continue
+            # Transport-level read failure (e.g. a truncated upload) — degrade to
+            # no annotation rather than 500ing a request whose 8 compliance checks
+            # already ran successfully above.
             traceback.print_exc()
+            image_bytes = None
+
+        if image_bytes is not None:
+            check_upload_size(image_bytes, "schematic_image")  # intentionally not caught — a genuine 413 should propagate
+
+            try:
+                # Resolve canvas coordinates for each element of interest
+                elem_by_id = {e["id"]: e for e in elements}
+                annotated_elements: list[dict] = []
+                for item in check1.elements_of_interest:
+                    el = elem_by_id.get(item["element_id"])
+                    if el:
+                        pos = el.get("position", {})
+                        annotated_elements.append({
+                            "canvas_x": pos.get("canvas_x", 0),
+                            "canvas_y": pos.get("canvas_y", 0),
+                            "label": item["label"],
+                            "color": item["color"],
+                        })
+
+                if annotated_elements:
+                    annotated_image_b64 = annotate_schematic(
+                        image_bytes=image_bytes,
+                        annotated_elements=annotated_elements,
+                        canvas_width=canvas_w,
+                        canvas_height=canvas_h,
+                    )
+            except Exception:
+                # Annotation failure is non-fatal — log and continue
+                traceback.print_exc()
 
     return EvaluateResponse(
         check1_backflow=asdict(check1),

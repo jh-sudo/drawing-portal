@@ -6,6 +6,7 @@ const DEFAULT_TIMEOUT_MS = 30_000;
 
 export const apiClient = axios.create({
   baseURL: BASE_URL,
+  timeout: DEFAULT_TIMEOUT_MS,
 });
 
 /** fetch() with a timeout — a hung backend otherwise leaves the caller's

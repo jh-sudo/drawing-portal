@@ -567,9 +567,15 @@ def check_water_efficiency(metadata: dict[str, Any]) -> CheckResult:
         fitting_type = el.get("fitting_type")
 
         ticks = el.get("efficiency_rating")
+        if isinstance(ticks, float) and ticks.is_integer():
+            # A whole-number float (e.g. 2.0) is a legitimate rating, just not
+            # normalized to int by whatever produced this payload — accept it
+            # before the malformed-value guard below would otherwise reject it.
+            ticks = int(ticks)
         if ticks is not None and not isinstance(ticks, int):
-            # Malformed rating (e.g. a string from a bad client payload) — treat
-            # as undeclared rather than let `ticks >= 2` raise a TypeError below.
+            # Malformed rating (e.g. a string, or a non-integer float, from a bad
+            # client payload) — treat as undeclared rather than let `ticks >= 2`
+            # raise a TypeError below.
             ticks = None
 
         # Appliance fittings (Section 6) are not MWELS-rated — skip
@@ -647,16 +653,22 @@ def check_water_efficiency(metadata: dict[str, Any]) -> CheckResult:
 
         tick_key = str(ticks)
         if tick_key not in mwels_entry:
-            # No declared figure for this exact tick count (e.g. an under-rated
-            # 1-tick fitting where MWELS only defines 2/3-tick tiers) — fall back
-            # to the least-efficient (highest-flow) tier actually present in this
-            # entry, rather than assuming "2" always exists. Using the worst
-            # defined tier is the closest available approximation to the true
-            # (undefined, and necessarily worse) design flow for an under-rated
-            # fitting, and avoids a KeyError for any MWELS entry that doesn't
-            # happen to define a "2" tier.
-            numeric_tiers = [k for k in mwels_entry if k.isdigit()]
-            tick_key = min(numeric_tiers, key=int)
+            # No declared figure for this exact tick count. Two distinct cases:
+            #   - Under-rated (ticks below every defined tier, e.g. a 1-tick
+            #     fitting where MWELS only defines 2/3-tick tiers): fall back to
+            #     the least-efficient (highest-flow) tier actually present —
+            #     the closest approximation to a true design flow that's
+            #     necessarily worse than anything in the table.
+            #   - Ticks ABOVE every defined tier (e.g. a stray 4 on a fitting
+            #     only rated up to 3): falling back to the worst tier would
+            #     silently inflate the reported design flow for a fitting that
+            #     should be at least as efficient as the best tier — use the
+            #     best (lowest-flow) defined tier instead.
+            # Either way this also avoids a KeyError for any MWELS entry that
+            # doesn't happen to define a "2" tier.
+            numeric_tiers = sorted(int(k) for k in mwels_entry if k.isdigit())
+            fallback_tier = numeric_tiers[0] if ticks < numeric_tiers[0] else numeric_tiers[-1]
+            tick_key = str(fallback_tier)
         design_flow = mwels_entry[tick_key]
         compliant = ticks >= 2
 

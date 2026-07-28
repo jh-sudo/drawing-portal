@@ -61,6 +61,27 @@ def test_pass_shower_head_3_ticks():
     assert r.status == "PASS"
 
 
+def test_pass_whole_number_float_tick_rating():
+    """Regression: a whole-number float (2.0) is a legitimate rating that must
+    still PASS — the isinstance(ticks, int) guard added to stop a string from
+    crashing `ticks >= 2` must not also reject a float that represents the
+    same valid integer value."""
+    m = meta([mwels_el("s1", "shower_head", "shower_tap", ticks=2.0)])
+    r = check_water_efficiency(m)
+    assert r.status == "PASS"
+    assert r.table[0]["compliant"] is True
+    assert r.table[0]["ticks"] == 2
+
+
+def test_non_integer_float_tick_rating_treated_as_undeclared():
+    """A non-integer float (e.g. 2.5) isn't a real tick value — must safely
+    become "undeclared" (FAIL), not crash and not silently pass."""
+    m = meta([mwels_el("s1", "shower_head", "shower_tap", ticks=2.5)])
+    r = check_water_efficiency(m)
+    assert r.status == "FAIL"
+    assert r.table[0]["compliant"] is None
+
+
 def test_pass_multiple_fixtures_all_compliant():
     elements = [
         mwels_el("s1", "shower_head", "shower_tap", ticks=2),
@@ -191,6 +212,20 @@ def test_fail_1_tick_shower_still_contributes_worst_case_flow_to_total():
     assert r.status == "FAIL"
     assert r.table[0]["design_flow"] == 7.0
     assert any("7.0" in d and "Total design flow demand" in d for d in r.detail)
+
+
+def test_over_range_tick_uses_best_defined_tier_not_worst():
+    """
+    Regression: a tick value ABOVE every tier MWELS defines for this fitting
+    (shower_tap only defines "2"/"3") must fall back to the BEST (lowest-flow)
+    defined tier, not the worst — the under-rated fallback logic previously
+    used `min(numeric_tiers)` unconditionally, which would wrongly inflate
+    design_flow (and total_flow_lpm) for a fitting simultaneously marked PASS.
+    """
+    m = meta([mwels_el("s1", "shower_head", "shower_tap", ticks=4)])
+    r = check_water_efficiency(m)
+    assert r.status == "PASS"
+    assert r.table[0]["design_flow"] == 5.0  # tier "3", not tier "2"'s 7.0
 
 
 def test_fail_mixed_compliant_and_non_compliant():
