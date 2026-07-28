@@ -138,11 +138,14 @@ def test_pass_washing_machine_4_ticks():
 
 def test_fail_washing_machine_1_tick():
     """Washing machines have no 1-tick tier at all (rated NA below 2-tick) — a stray
-    ticks=1 value must still fail, not crash on a missing '1' key in the MWELS table."""
+    ticks=1 value must still fail, not crash on a missing '1' key in the MWELS table.
+    The reported design_flow falls back to the worst (lowest-numbered) tier actually
+    defined for this fitting — "2" — rather than a hardcoded assumption."""
     m = meta([mwels_el("wm1", "washing_machine", "washing_machine", ticks=1)])
     r = check_water_efficiency(m)
     assert r.status == "FAIL"
     assert r.table[0]["compliant"] is False
+    assert r.table[0]["design_flow"] == 12.0
 
 
 def test_fail_washing_machine_undeclared():
@@ -174,6 +177,21 @@ def test_fail_dishwasher_1_tick():
 # ---------------------------------------------------------------------------
 # Mixed: one compliant, one non-compliant
 # ---------------------------------------------------------------------------
+
+def test_fail_1_tick_shower_still_contributes_worst_case_flow_to_total():
+    """
+    Regression: a 1-tick shower_tap (below the >=2 minimum, must FAIL) has no MWELS
+    figure defined below the 2-tick tier, so its contribution to the "Total design
+    flow demand" summary must resolve to the worst (lowest-numbered) tier actually
+    in the table (7.0 L/min for shower_tap's "2" tier), not silently KeyError or
+    fall back to an unrelated hardcoded value.
+    """
+    m = meta([mwels_el("s1", "shower_head", "shower_tap", ticks=1)])
+    r = check_water_efficiency(m)
+    assert r.status == "FAIL"
+    assert r.table[0]["design_flow"] == 7.0
+    assert any("7.0" in d and "Total design flow demand" in d for d in r.detail)
+
 
 def test_fail_mixed_compliant_and_non_compliant():
     elements = [

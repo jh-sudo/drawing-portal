@@ -94,8 +94,10 @@ export function useCanvasInteraction() {
       if (!isPipeTool) return;
 
       // Snap to a port if the click is close enough.
-      // For typed pipes, prefer the matching-label port within a larger radius
-      // so drawing a cold pipe near a dual-supply fixture always lands on Cold.
+      // For typed pipes, also search the matching-label port within a larger
+      // radius — but it only wins the tie when at least as close as the
+      // nearest generic port, so it never steals a click that's clearly on a
+      // different, nearer port (see findNearestPort's docstring).
       const elements = useCanvasStore.getState().elements;
       const pipeType = activeToPipeType(activeTool);
       const preferLabel = pipeType === 'cold' ? 'Cold' : pipeType === 'hot' ? 'Hot' : undefined;

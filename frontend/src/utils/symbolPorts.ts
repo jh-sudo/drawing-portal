@@ -442,10 +442,12 @@ export interface NearestPortResult {
  * Find the port closest to (cx, cy) within `threshold` px.
  *
  * When `preferLabel` is provided (e.g. 'Cold' or 'Hot'), ports whose label
- * matches are searched within `labelThreshold` px (default 16) instead of the
- * normal threshold. The best label-matching result wins over any non-matching
- * result, so drawing a cold pipe near a dual-supply fixture always snaps to the
- * Cold port even if the click was closer to the Hot port or the symbol centre.
+ * matches are also searched within the wider `labelThreshold` px (default 16),
+ * not just the normal (tighter) threshold. The closest candidate overall wins;
+ * the labeled port is only preferred as a tie-break when it is at least as
+ * close as the nearest generic port — it never overrides a generic port that
+ * is physically nearer, so an unrelated port right under the cursor still
+ * takes priority over a same-labeled port further away.
  */
 export function findNearestPort(
   cx: number,

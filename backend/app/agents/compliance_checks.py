@@ -641,7 +641,18 @@ def check_water_efficiency(metadata: dict[str, Any]) -> CheckResult:
             })
             continue
 
-        tick_key = str(ticks) if str(ticks) in mwels_entry else "2"
+        tick_key = str(ticks)
+        if tick_key not in mwels_entry:
+            # No declared figure for this exact tick count (e.g. an under-rated
+            # 1-tick fitting where MWELS only defines 2/3-tick tiers) — fall back
+            # to the least-efficient (highest-flow) tier actually present in this
+            # entry, rather than assuming "2" always exists. Using the worst
+            # defined tier is the closest available approximation to the true
+            # (undefined, and necessarily worse) design flow for an under-rated
+            # fitting, and avoids a KeyError for any MWELS entry that doesn't
+            # happen to define a "2" tier.
+            numeric_tiers = [k for k in mwels_entry if k.isdigit()]
+            tick_key = min(numeric_tiers, key=int)
         design_flow = mwels_entry[tick_key]
         compliant = ticks >= 2
 

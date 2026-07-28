@@ -170,8 +170,10 @@ interface CanvasStore {
   updateAnnotationSize: (id: string, height: number) => void;
   resizeAnnotation: (id: string, maxWidth: number, height: number) => void;
 
-  // Scale change — resize all content proportionally, anchored to canvas bottom (lowerMRL)
-  rescaleAll: (oldScale: number, newScale: number, virtualHeight: number) => void;
+  // Scale/paper-size change — resize all content proportionally, anchored to
+  // canvas bottom (lowerMRL). oldVirtualHeight/newVirtualHeight let the anchor
+  // itself move (paper size change) independently of the drawing-scale factor.
+  rescaleAll: (oldScale: number, newScale: number, oldVirtualHeight: number, newVirtualHeight: number) => void;
 
   // Copy-paste
   copySelection: () => void;
@@ -575,7 +577,7 @@ export const useCanvasStore = create<CanvasStore>()(persist((set, get) => {
       }));
     },
 
-    rescaleAll: (oldScale, newScale, virtualHeight) => {
+    rescaleAll: (oldScale, newScale, oldVirtualHeight, newVirtualHeight) => {
       const { elements, pipes } = get();
       if (elements.length === 0 && pipes.length === 0) return;
       // factor < 1 when scale increases (1:100→1:200): content compresses
@@ -585,16 +587,18 @@ export const useCanvasStore = create<CanvasStore>()(persist((set, get) => {
         elements: state.elements.map((el) => ({
           ...el,
           x: AXIS_WIDTH + (el.x - AXIS_WIDTH) * factor,
-          // anchor y at canvas bottom (= lowerMRL) so elevations are preserved
-          y: virtualHeight - (virtualHeight - el.y) * factor,
+          // anchor y at canvas bottom (= lowerMRL) so elevations are preserved —
+          // measured from the OLD bottom, reapplied from the NEW bottom, so a
+          // paper-size change (which moves the bottom) doesn't shift elevations
+          y: newVirtualHeight - (oldVirtualHeight - el.y) * factor,
           // width/height are fixed paper-size — not scaled with drawing scale
         })),
         pipes: state.pipes.map((p) => ({
           ...p,
           startX: AXIS_WIDTH + (p.startX - AXIS_WIDTH) * factor,
-          startY: virtualHeight - (virtualHeight - p.startY) * factor,
+          startY: newVirtualHeight - (oldVirtualHeight - p.startY) * factor,
           endX:   AXIS_WIDTH + (p.endX   - AXIS_WIDTH) * factor,
-          endY:   virtualHeight - (virtualHeight - p.endY)   * factor,
+          endY:   newVirtualHeight - (oldVirtualHeight - p.endY)   * factor,
         })),
       }));
     },

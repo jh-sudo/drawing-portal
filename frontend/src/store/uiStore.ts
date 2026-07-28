@@ -140,10 +140,13 @@ export const useUiStore = create<UiStore>()(persist((set, get) => ({
   registerPdfImport: (fn) => set({ pdfImportFn: fn }),
   setSheetConfig: (cfg) => {
     const { sheetConfig: prev, mrlConfig } = get();
-    if (cfg.drawingScale !== prev.drawingScale) {
-      // Use the OLD paper size's height as the bottom anchor (lowerMRL position)
-      const virtualH = PAPER_SIZES_MM[prev.paperSize].h * SHEET_PX_PER_MM;
-      useCanvasStore.getState().rescaleAll(prev.drawingScale, cfg.drawingScale, virtualH);
+    // Paper size alone (even with drawingScale unchanged) moves the canvas-bottom
+    // anchor that elevations are measured from — both must trigger a rescale, or
+    // every element's real-world elevation silently drifts with no visual change.
+    if (cfg.drawingScale !== prev.drawingScale || cfg.paperSize !== prev.paperSize) {
+      const oldVirtualH = PAPER_SIZES_MM[prev.paperSize].h * SHEET_PX_PER_MM;
+      const newVirtualH = PAPER_SIZES_MM[cfg.paperSize].h * SHEET_PX_PER_MM;
+      useCanvasStore.getState().rescaleAll(prev.drawingScale, cfg.drawingScale, oldVirtualH, newVirtualH);
     }
     set({ sheetConfig: cfg, mrlConfig: { lowerMrl: mrlConfig.lowerMrl, upperMrl: getUpperMrl(mrlConfig.lowerMrl, cfg) } });
   },

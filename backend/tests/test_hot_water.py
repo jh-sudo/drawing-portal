@@ -124,6 +124,32 @@ def test_rule63_heater_no_protection_fails():
     assert has_fail_line(r.detail, "Rule 6.3")
 
 
+def test_rule63_unrelated_check_valve_on_other_branch_does_not_count():
+    """
+    Regression: a water heater with exactly one genuine upstream check valve
+    (no PRV — must FAIL) sits on a shared main alongside a dishwasher that has
+    its own, separate check valve for Rule 6.4. The dishwasher's valve is
+    reachable from the heater within the 5-hop search radius, but it is on an
+    unrelated branch, not in series with the heater's own valve — it must NOT
+    be counted towards Rule 6.3's "double check valve assembly" and produce a
+    false PASS.
+    """
+    elements = [
+        el("h1", "water_heater"),
+        el("cv1", "check_valve"),
+        el("dw1", "dishwasher", backflow_requirement="check_valve"),
+        el("cv2", "check_valve"),
+    ]
+    pipes = [
+        pipe("p1", "cv1", "h1"),   # cv1 genuinely protects h1 (alone — insufficient)
+        pipe("p2", "h1", "dw1"),   # shared main branch point
+        pipe("p3", "cv2", "dw1"),  # cv2 protects dw1 under Rule 6.4, unrelated to h1
+    ]
+    r = check_hot_water_contamination(meta(elements, pipes))
+    assert has_fail_line(r.detail, "Rule 6.3")
+    assert not has_pass_line(r.detail, "Rule 6.3")
+
+
 # ---------------------------------------------------------------------------
 # Rule 6.4 — Appliance double check valves
 # ---------------------------------------------------------------------------

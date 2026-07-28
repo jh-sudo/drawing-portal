@@ -133,30 +133,43 @@ def _check_heater_direct_supply_type(elements: list[dict]) -> list[tuple[str, st
     return lines
 
 
-def _bfs_count_symbol(
+def _has_series_check_valves(
     adj: dict[str, set[str]],
     start_id: str,
-    target_symbol_id: str,
     elem_by_id: dict[str, dict],
     max_hops: int = DEFAULT_MAX_HOPS,
-) -> int:
-    """BFS from start_id; returns the count of DISTINCT elements matching target_symbol_id within max_hops."""
-    visited: set[str] = {start_id}
-    queue: list[tuple[str, int]] = [(start_id, 0)]
-    count = 0
-    while queue:
-        node, dist = queue.pop(0)
-        if dist > 0:
-            el = elem_by_id.get(node)
-            if el and el.get("symbol_id") == target_symbol_id:
-                count += 1
+    required: int = 2,
+) -> bool:
+    """DFS from start_id; returns True iff some SIMPLE path from start_id (within
+    max_hops) passes through at least `required` check_valve elements in series.
+
+    Must walk simple paths (no node repeated within a single path) rather than a
+    plain BFS/visited-set count: on this undirected graph, a BFS that only dedupes
+    by (node, chain_count) can bounce back and forth across a single check valve
+    (start -> cv -> start -> cv again with a different distance) and double-count
+    the same physical valve as if it were two in series. Backtracking DFS avoids
+    that, and — since it's per-path — also correctly refuses to credit two check
+    valves that sit on unrelated branches off a shared main line (each protecting
+    a different fixture) as a single valid "double check valve assembly" for this
+    heater.
+    """
+    def dfs(node: str, dist: int, chain: int, path: set[str]) -> bool:
         if dist >= max_hops:
-            continue
+            return False
         for nbr in adj.get(node, ()):
-            if nbr not in visited:
-                visited.add(nbr)
-                queue.append((nbr, dist + 1))
-    return count
+            if nbr in path:
+                continue
+            el = elem_by_id.get(nbr)
+            nbr_chain = chain + 1 if (el and el.get("symbol_id") == "check_valve") else chain
+            if nbr_chain >= required:
+                return True
+            path.add(nbr)
+            if dfs(nbr, dist + 1, nbr_chain, path):
+                return True
+            path.remove(nbr)
+        return False
+
+    return dfs(start_id, 0, 0, {start_id})
 
 
 # ---------------------------------------------------------------------------
@@ -188,7 +201,7 @@ def _check_heater_protection(
 
         cv_id, cv_hops = _bfs_find(adj, hid, {"check_valve"}, elem_by_id)
         prv_id, prv_hops = _bfs_find(adj, hid, {"pressure_relief_valve"}, elem_by_id)
-        cv_count = _bfs_count_symbol(adj, hid, "check_valve", elem_by_id)
+        has_series_cv = _has_series_check_valves(adj, hid, elem_by_id)
 
         if cv_id and prv_id:
             lines.append((
@@ -196,9 +209,9 @@ def _check_heater_protection(
                 f"backflow protection confirmed.",
                 hid,
             ))
-        elif cv_count >= 2:
+        elif has_series_cv:
             lines.append((
-                f"✓ Rule 6.3: [{name}] Double check valve assembly detected ({cv_count} check valves) — "
+                f"✓ Rule 6.3: [{name}] Double check valve assembly detected (two check valves in series) — "
                 f"backflow protection confirmed.",
                 hid,
             ))

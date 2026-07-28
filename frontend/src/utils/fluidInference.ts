@@ -1,4 +1,4 @@
-import { SYMBOL_PORTS, getPortPosition } from './symbolPorts';
+import { getElementPorts, getEffectivePortRole, getPortPosition } from './symbolPorts';
 import type { PipeElement, CanvasElement } from '../types';
 
 /**
@@ -35,9 +35,10 @@ export function inferFluidAtPoint(
       const otherY = atEnd ? pipe.startY : pipe.endY;
       outer:
       for (const el of allElements) {
-        for (const port of SYMBOL_PORTS[el.symbolId] ?? []) {
-          if (port.role !== 'downstream') continue;
-          const pos = getPortPosition(el, port);
+        const ports = getElementPorts(el);
+        for (let i = 0; i < ports.length; i++) {
+          if (getEffectivePortRole(el, i) !== 'downstream') continue;
+          const pos = getPortPosition(el, ports[i]);
           if (Math.hypot(pos.x - otherX, pos.y - otherY) < matchRadius) {
             result = el.carriesFluid;
             break outer;
