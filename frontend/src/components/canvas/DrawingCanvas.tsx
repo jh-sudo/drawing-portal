@@ -169,7 +169,11 @@ export function DrawingCanvas({ onSizeChange }: DrawingCanvasProps) {
   // Zoom helper — keeps viewport centre fixed in content space
   const zoom = useCallback((delta: number) => {
     setStageScale((prevScale) => {
-      const newScale = Math.max(baseScale, Math.min(MAX_SCALE, prevScale + delta));
+      // Read via ref, not the closed-over `baseScale` state — fitToScreen() can
+      // change baseScale without changing canvasSize/virtualHeight, which would
+      // otherwise leave this callback's memoized closure clamping against a
+      // stale value (the wheel-zoom handler already does this correctly).
+      const newScale = Math.max(baseScaleRef.current, Math.min(MAX_SCALE, prevScale + delta));
       if (newScale === prevScale) return prevScale;
       setStageOffsetY((prevOffset) => {
         const vp = canvasSize.height;
@@ -1092,6 +1096,15 @@ export function DrawingCanvas({ onSizeChange }: DrawingCanvasProps) {
         // Ghost drag-to-place: offset all elements/pipes/annotations so the template centre lands on click
         const xs = [...pt.elements.map((e) => e.x), ...pt.pipes.flatMap((p) => [p.startX, p.endX]), ...pt.annotations.map((a) => a.x)];
         const ys = [...pt.elements.map((e) => e.y), ...pt.pipes.flatMap((p) => [p.startY, p.endY]), ...pt.annotations.map((a) => a.y)];
+        // An empty template (no elements/pipes/annotations) has no centroid to
+        // offset from — Math.min/max of an empty array is ±Infinity, which would
+        // otherwise place everything at NaN (matches the ghost-preview guard in
+        // ElementsLayer.tsx).
+        if (xs.length === 0) {
+          setPendingTemplate(null);
+          setGhostPos(null);
+          return;
+        }
         const cx = (Math.min(...xs) + Math.max(...xs)) / 2;
         const cy = (Math.min(...ys) + Math.max(...ys)) / 2;
         const dx = pos.x - cx;
@@ -1645,7 +1658,7 @@ export function DrawingCanvas({ onSizeChange }: DrawingCanvasProps) {
         zIndex: 20,
       }}>
         <button
-          onClick={() => zoom(-SCALE_STEP)}
+          onClick={() => { setEditingAnnotation(null); zoom(-SCALE_STEP); }}
           title="Zoom out"
           style={{
             width: 32, height: 32,
@@ -1674,7 +1687,7 @@ export function DrawingCanvas({ onSizeChange }: DrawingCanvasProps) {
           {Math.round((stageScale / baseScale) * 100)}%
         </div>
         <button
-          onClick={() => zoom(SCALE_STEP)}
+          onClick={() => { setEditingAnnotation(null); zoom(SCALE_STEP); }}
           title="Zoom in"
           style={{
             width: 32, height: 32,
@@ -1690,7 +1703,7 @@ export function DrawingCanvas({ onSizeChange }: DrawingCanvasProps) {
           }}
         >+</button>
         <button
-          onClick={fitToScreen}
+          onClick={() => { setEditingAnnotation(null); fitToScreen(); }}
           title="Fit to screen"
           style={{
             width: 32, height: 32,

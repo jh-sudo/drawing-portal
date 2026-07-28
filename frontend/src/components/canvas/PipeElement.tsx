@@ -145,10 +145,16 @@ export function PipeElement({
   const dash: [number, number] | undefined = pipeType === 'hot' ? PIPE_HOT_DASH : undefined;
   const segments = buildJumpSegments(startX, startY, endX, endY, jumps ?? [], PIPE_JUMP_RADIUS_PX);
 
-  // Skip zero-length pipes
   const dx = endX - startX;
   const dy = endY - startY;
-  if (Math.abs(dx) < 1 && Math.abs(dy) < 1) return null;
+  // A pipe collapsed to near-zero length (e.g. one endpoint dragged onto the
+  // other) still renders its Line segment(s) and endpoint Circles below — that
+  // Line is what gives it a clickable hit region at all (the Circles only
+  // start listening once selected), so bailing out entirely here would make
+  // the pipe permanently unselectable/undeletable while still existing in the
+  // store. Only the arrowhead and diameter label — meaningless at a point —
+  // are skipped.
+  const isNearZeroLength = Math.abs(dx) < 1 && Math.abs(dy) < 1;
 
   // Flow-direction arrowhead, pointing start->end, drawn at the pipe's midpoint.
   // All pipe types carry this start=outlet/end=inlet direction convention —
@@ -254,23 +260,25 @@ export function PipeElement({
           />
         );
       })}
-      <Arrow
-        points={[arrow.tailX, arrow.tailY, arrow.midX, arrow.midY]}
-        stroke={color}
-        fill={color}
-        strokeWidth={strokeWidth}
-        lineCap="round"
-        lineJoin="round"
-        hitStrokeWidth={3}
-        pointerLength={PIPE_ARROW_POINTER_LENGTH}
-        pointerWidth={PIPE_ARROW_POINTER_WIDTH}
-        perfectDrawEnabled={false}
-        onClick={handleBodyClick}
-        onTap={handleBodyTap}
-        onMouseEnter={handleBodyMouseEnter}
-        onMouseLeave={handleBodyMouseLeave}
-      />
-      {diameterLabel && (() => {
+      {!isNearZeroLength && (
+        <Arrow
+          points={[arrow.tailX, arrow.tailY, arrow.midX, arrow.midY]}
+          stroke={color}
+          fill={color}
+          strokeWidth={strokeWidth}
+          lineCap="round"
+          lineJoin="round"
+          hitStrokeWidth={3}
+          pointerLength={PIPE_ARROW_POINTER_LENGTH}
+          pointerWidth={PIPE_ARROW_POINTER_WIDTH}
+          perfectDrawEnabled={false}
+          onClick={handleBodyClick}
+          onTap={handleBodyTap}
+          onMouseEnter={handleBodyMouseEnter}
+          onMouseLeave={handleBodyMouseLeave}
+        />
+      )}
+      {!isNearZeroLength && diameterLabel && (() => {
         const anchor = getPipeDiameterLabelAnchor(startX, startY, endX, endY, PIPE_DIAMETER_LABEL_OFFSET);
         const w = PIPE_DIAMETER_LABEL_BOX_WIDTH;
         const boxX = anchor.align === 'center' ? anchor.x - w / 2 : anchor.align === 'right' ? anchor.x - w : anchor.x;
