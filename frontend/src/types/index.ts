@@ -177,12 +177,6 @@ export const MWELS_TICK_OPTIONS: Partial<Record<WaterFittingTypeId, readonly num
 };
 export const DEFAULT_MWELS_TICK_OPTIONS = [2, 3] as const;
 
-/** MWELS category options presented for ambiguous fixture symbols. */
-export const AMBIGUOUS_TAP_OPTIONS: { id: WaterFittingTypeId; label: string }[] = [
-  { id: 'basin_tap', label: 'Basin Tap & Mixer' },
-  { id: 'sink_tap',  label: 'Sink/Bib Tap & Mixer' },
-];
-
 export const ROTATABLE_SYMBOL_IDS = [
   'check_valve', 'gate_valve', 'tee_junction', 'pump', 'elbow_bend', 'water_tank', 'water_heater', 'instantaneous_water_heater', 'water_meter',
   // new inline valves & equipment

@@ -1,7 +1,7 @@
-from fastapi import APIRouter, UploadFile, File, Form
+from fastapi import APIRouter
 from fastapi.responses import FileResponse
 
-from app.models.symbol import SymbolList, SymbolMeta, SymbolRenameRequest, SymbolCreateResponse
+from app.models.symbol import SymbolList, SymbolMeta
 from app.services import symbol_service
 from app.config import settings
 from app.schemas.manifest import read_manifest
@@ -42,38 +42,3 @@ async def get_symbol_image(symbol_id: str):
     suffix = path.suffix.lower()
     media_type = "image/svg+xml" if suffix == ".svg" else "image/png"
     return FileResponse(str(path), media_type=media_type)
-
-
-@router.post("", response_model=SymbolCreateResponse, status_code=201)
-async def upload_symbol(
-    file: UploadFile = File(...),
-    name: str = Form(...),
-):
-    return await symbol_service.create_symbol(file, name)
-
-
-@router.patch("/{symbol_id}", response_model=SymbolMeta)
-async def rename_symbol(symbol_id: str, body: SymbolRenameRequest):
-    updated = symbol_service.rename_symbol(symbol_id, body.name)
-    from datetime import datetime, timezone
-    created_at = updated.get("created_at", "2026-01-01T00:00:00+00:00")
-    if isinstance(created_at, str):
-        try:
-            dt = datetime.fromisoformat(created_at)
-        except ValueError:
-            dt = datetime.now(timezone.utc)
-    else:
-        dt = created_at
-    return SymbolMeta(
-        id=updated["id"],
-        name=updated["name"],
-        category=updated["category"],
-        filename=updated["filename"],
-        url=updated["url"],
-        created_at=dt,
-    )
-
-
-@router.delete("/{symbol_id}", status_code=204)
-async def delete_symbol(symbol_id: str):
-    symbol_service.delete_symbol(symbol_id)

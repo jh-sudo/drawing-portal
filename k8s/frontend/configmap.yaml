@@ -1,7 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: frontend-config
-  namespace: schematic-portal
-data:
-  VITE_API_BASE_URL: "http://backend-service:8000"

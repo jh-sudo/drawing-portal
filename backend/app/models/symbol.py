@@ -14,14 +14,3 @@ class SymbolMeta(BaseModel):
 
 class SymbolList(BaseModel):
     symbols: list[SymbolMeta]
-
-
-class SymbolRenameRequest(BaseModel):
-    name: str
-
-
-class SymbolCreateResponse(BaseModel):
-    id: str
-    name: str
-    category: Literal["default", "custom", "water_supply", "backflow_prevention", "pumps", "tanks", "sanitary"]
-    url: str

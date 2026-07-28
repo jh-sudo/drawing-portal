@@ -54,25 +54,11 @@ backend/symbols/custom/*
 # Stage 2: API keys
 backend/.env
 
-# Stage 2: ChromaDB vector store (generated at runtime)
-backend/chroma_db/
-
-# Stage 2: SQLite metrics DB (generated at runtime)
-backend/metrics.db
-
-# Stage 2: Knowledge docs (user uploads — not committed)
-backend/knowledge/*
-!backend/knowledge/.gitkeep
-
 # Runtime logs
 *.log
 
 # Runtime process IDs
 .pids
-
-# Root-level generated files (runtime)
-chroma_db/
-metrics.db
 
 # LinkedIn / content files (local review only)
 linkedin_post.txt

@@ -9,13 +9,10 @@ services:
       - "8000:8000"
     volumes:
       - ./backend/symbols:/app/symbols
-      - ./backend/chroma_db:/app/chroma_db
-      - ./backend/knowledge:/app/knowledge
     env_file:
       - ./backend/.env
     environment:
       - SYMBOLS_PATH=/app/symbols
-      - ALLOWED_ORIGINS=http://localhost:3000,http://localhost:5173,http://frontend
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health')\""]
       interval: 10s
@@ -28,7 +25,7 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
     ports:
-      - "3000:80"
+      - "3000:3000"
     depends_on:
       backend:
         condition: service_healthy

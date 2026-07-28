@@ -1,8 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: backend-config
-  namespace: schematic-portal
-data:
-  SYMBOLS_PATH: "/app/symbols"
-  ALLOWED_ORIGINS: "http://frontend-service,http://localhost:3000"

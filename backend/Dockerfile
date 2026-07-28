@@ -17,7 +17,5 @@ COPY symbols/ ./symbols/
 # this only works because you create it locally before running `airbase deploy`.
 COPY .env* ./
 
-ENV ALLOWED_ORIGINS=http://localhost:3000,http://localhost:5173,https://spd-fe-2.app.tc1.airbase.sg
-
 EXPOSE 8000
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
