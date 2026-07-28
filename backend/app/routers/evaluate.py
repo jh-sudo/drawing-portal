@@ -30,6 +30,7 @@ from app.agents.hot_water_contamination_check import check_hot_water_contaminati
 from app.agents.section3_pipe_check import check_section3_pipes
 from app.agents.highest_fitting_check import check_highest_direct_supply_fitting
 from app.services.image_annotator import annotate_schematic
+from app.services.upload_limits import check_upload_size
 
 router = APIRouter()
 
@@ -57,6 +58,14 @@ def _validate_metadata(metadata: dict) -> None:
     for i, pipe in enumerate(pipes):
         if not isinstance(pipe, dict) or not pipe.get("id"):
             raise HTTPException(status_code=422, detail=f"metadata.pipes[{i}] is missing a non-empty 'id' field.")
+
+    canvas = metadata.get("canvas", {})
+    if not isinstance(canvas, dict):
+        raise HTTPException(status_code=422, detail="metadata.canvas must be an object.")
+    for field in ("width_px", "height_px"):
+        value = canvas.get(field)
+        if value is not None and not isinstance(value, (int, float)):
+            raise HTTPException(status_code=422, detail=f"metadata.canvas.{field} must be a number.")
 
 
 # ---------------------------------------------------------------------------
@@ -99,8 +108,11 @@ async def evaluate_schematic(
     elements: list[dict] = metadata.get("elements", [])
     pipes: list[dict] = metadata.get("pipes", [])
     canvas: dict = metadata.get("canvas", {})
-    canvas_w = int(canvas.get("width_px", 1200))
-    canvas_h = int(canvas.get("height_px", 800))
+    # _validate_metadata already rejects non-numeric width_px/height_px, but an
+    # explicit `null` passes that check (it's a legitimate "not provided") and
+    # still needs a default here rather than reaching int(None).
+    canvas_w = int(canvas.get("width_px") or 1200)
+    canvas_h = int(canvas.get("height_px") or 800)
 
     # Built once and shared by every check that needs topology (REG28, HOT_WATER,
     # TANK_PUMP) — they all previously rebuilt the identical O(n²) proximity graph.
@@ -120,9 +132,10 @@ async def evaluate_schematic(
     annotated_image_b64: str | None = None
 
     if schematic_image is not None and check1.elements_of_interest:
-        try:
-            image_bytes = await schematic_image.read()
+        image_bytes = await schematic_image.read()
+        check_upload_size(image_bytes, "schematic_image")
 
+        try:
             # Resolve canvas coordinates for each element of interest
             elem_by_id = {e["id"]: e for e in elements}
             annotated_elements: list[dict] = []

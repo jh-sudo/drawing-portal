@@ -25,6 +25,8 @@ from docx.shared import Inches
 from fastapi import APIRouter, File, Form, HTTPException, UploadFile
 from fastapi.responses import StreamingResponse
 
+from app.services.upload_limits import MAX_CROPS_PER_EXPORT, check_upload_size
+
 router = APIRouter()
 
 
@@ -40,7 +42,14 @@ async def export_docx(
     if not isinstance(rows, list):
         raise HTTPException(status_code=422, detail="manifest_json must be a JSON array.")
 
-    crop_bytes: list[bytes] = [await f.read() for f in crops]
+    if len(crops) > MAX_CROPS_PER_EXPORT:
+        raise HTTPException(status_code=413, detail=f"Too many crop files (max {MAX_CROPS_PER_EXPORT}).")
+
+    crop_bytes: list[bytes] = []
+    for f in crops:
+        content = await f.read()
+        check_upload_size(content, "crop file")
+        crop_bytes.append(content)
 
     document = Document()
     document.add_heading("Compliance Evaluation — Non-Compliant Items", level=1)
@@ -56,8 +65,13 @@ async def export_docx(
         crop_index = row.get("crop_index")
         table_row = table.add_row()
         if isinstance(crop_index, int) and 0 <= crop_index < len(crop_bytes):
-            run = table_row.cells[0].paragraphs[0].add_run()
-            run.add_picture(io.BytesIO(crop_bytes[crop_index]), width=Inches(2.5))
+            try:
+                run = table_row.cells[0].paragraphs[0].add_run()
+                run.add_picture(io.BytesIO(crop_bytes[crop_index]), width=Inches(2.5))
+            except Exception:
+                # Not a decodable image (corrupt/wrong-format upload) — leave the
+                # cell blank rather than failing the whole export.
+                pass
         status = row.get("status", "")
         check_title = row.get("check_title", "")
         check_id = row.get("check_id", "")

@@ -567,6 +567,10 @@ def check_water_efficiency(metadata: dict[str, Any]) -> CheckResult:
         fitting_type = el.get("fitting_type")
 
         ticks = el.get("efficiency_rating")
+        if ticks is not None and not isinstance(ticks, int):
+            # Malformed rating (e.g. a string from a bad client payload) — treat
+            # as undeclared rather than let `ticks >= 2` raise a TypeError below.
+            ticks = None
 
         # Appliance fittings (Section 6) are not MWELS-rated — skip
         if fitting_type in NON_MWELS_FITTING_IDS:

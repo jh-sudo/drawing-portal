@@ -22,6 +22,16 @@ COLOR_MAP: dict[str, str] = {
     "blue":   "#2563eb",
 }
 
+# A schematic photo/screenshot has no legitimate reason to exceed this — guards
+# against spending CPU/memory decoding a decompression-bomb-style image before
+# any upload-size check has a chance to reject it (image dimensions are cheap
+# to read from the header via Image.open(), well before pixel data is decoded).
+MAX_ANNOTATE_PIXELS = 40_000_000  # e.g. ~6300x6300
+
+
+class ImageTooLargeError(ValueError):
+    pass
+
 
 def annotate_schematic(
     image_bytes: bytes,
@@ -52,8 +62,11 @@ def annotate_schematic(
     str
         Base64-encoded JPEG string (no data URI prefix).
     """
-    img = Image.open(io.BytesIO(image_bytes)).convert("RGB")
-    img_w, img_h = img.size
+    img = Image.open(io.BytesIO(image_bytes))
+    img_w, img_h = img.size  # cheap header read — no pixel decode yet
+    if img_w * img_h > MAX_ANNOTATE_PIXELS:
+        raise ImageTooLargeError(f"Image {img_w}x{img_h} exceeds the {MAX_ANNOTATE_PIXELS}px annotation limit")
+    img = img.convert("RGB")
 
     # Scale factors: image pixels per canvas pixel
     scale_x = img_w / max(canvas_width, 1)
