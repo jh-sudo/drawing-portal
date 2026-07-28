@@ -103,7 +103,16 @@ function applyDcvAssemblies(
     if (targetPipeId) {
       const orig = pipes.find((p) => p.id === targetPipeId);
       if (orig) {
-        const pipeA = derivePipe(orig, { startX: orig.startX, startY: orig.startY, endX: snapX, endY: snapY, diameterLabel: orig.diameterLabel });
+        // asmEls is ordered nearest-the-fixture first, so the last element is the
+        // outermost (most upstream) one — its inlet is where the truncated pipe
+        // now ends, matching the explicit-binding pattern insertElementOnPipe uses.
+        const outerEl = asmEls[asmEls.length - 1];
+        const pipeA = derivePipe(orig, {
+          startX: orig.startX, startY: orig.startY, endX: snapX, endY: snapY,
+          startElementId: orig.startElementId, startPortIndex: orig.startPortIndex,
+          endElementId: outerEl?.id, endPortIndex: outerEl ? findElementPortIndexAt(outerEl, snapX, snapY) : undefined,
+          diameterLabel: orig.diameterLabel,
+        });
         pipes = [...pipes.filter((p) => p.id !== targetPipeId), pipeA];
       }
     }
@@ -132,7 +141,6 @@ interface CanvasStore {
 
   // Canvas mutations
   addElement: (el: CanvasElement) => void;
-  loadTemplate: (elements: CanvasElement[], pipes: PipeElement[]) => void;
   loadSchematic: (elements: CanvasElement[], pipes: PipeElement[], annotations?: AnnotationElement[]) => void;
   appendTemplate: (elements: CanvasElement[], pipes: PipeElement[], annotations?: AnnotationElement[]) => void;
   updateElementPosition: (id: string, x: number, y: number) => void;
@@ -144,7 +152,6 @@ interface CanvasStore {
   setPipesDiameterLabel: (pipeIds: string[], diameterLabel: string | null) => void;
   updateElementRotation: (id: string, rotation: number) => void;
   updateElementScaleX: (id: string, scaleX: number) => void;
-  updateFittingType: (id: string, fittingType: string) => void;
   updateEfficiencyRating: (id: string, rating: 1 | 2 | 3 | 4) => void;
   updateLongBathCapacity: (id: string, capacityL: number) => void;
   updatePumpRatedHead: (id: string, headM: number | undefined) => void;
@@ -165,7 +172,6 @@ interface CanvasStore {
   addAnnotation: (ann: Omit<AnnotationElement, 'height'> & { height?: number }) => void;
   moveAnnotation: (id: string, x: number, y: number) => void;
   removeAnnotation: (id: string) => void;
-  removeAnnotations: (ids: string[]) => void;
   updateAnnotation: (id: string, text: string, maxWidth?: number) => void;
   updateAnnotationSize: (id: string, height: number) => void;
   resizeAnnotation: (id: string, maxWidth: number, height: number) => void;
@@ -226,11 +232,6 @@ export const useCanvasStore = create<CanvasStore>()(persist((set, get) => {
     addElement: (el) => {
       pushHistory();
       set((state) => ({ elements: [...state.elements, el] }));
-    },
-
-    loadTemplate: (elements, pipes) => {
-      pushHistory();
-      set({ elements, pipes, selectedId: null, selectedIds: [], selectedPipeIds: [] });
     },
 
     loadSchematic: (elements, pipes, annotations = []) => {
@@ -358,11 +359,6 @@ export const useCanvasStore = create<CanvasStore>()(persist((set, get) => {
       });
     },
 
-    updateFittingType: (id, fittingType) => {
-      pushHistory();
-      set((state) => ({ elements: state.elements.map((el) => el.id === id ? { ...el, fittingType } : el) }));
-    },
-
     updateEfficiencyRating: (id, efficiencyRating) => {
       pushHistory();
       set((state) => ({ elements: state.elements.map((el) => el.id === id ? { ...el, efficiencyRating } : el) }));
@@ -388,10 +384,12 @@ export const useCanvasStore = create<CanvasStore>()(persist((set, get) => {
       set((state) => ({ pipes: [...state.pipes, pipe] }));
     },
 
-    updatePipeEndpoints: (id, startX, startY, endX, endY) =>
+    updatePipeEndpoints: (id, startX, startY, endX, endY) => {
+      pushHistory();
       set((state) => ({
         pipes: state.pipes.map((p) => p.id === id ? { ...p, startX, startY, endX, endY } : p),
-      })),
+      }));
+    },
 
     insertElementOnPipe: (pipeId, element, snapX, snapY, terminatePipe = false) => {
       pushHistory();
@@ -563,17 +561,6 @@ export const useCanvasStore = create<CanvasStore>()(persist((set, get) => {
       set((state) => ({
         annotations: state.annotations.filter((a) => a.id !== id),
         selectedId: state.selectedId === id ? null : state.selectedId,
-      }));
-    },
-
-    removeAnnotations: (ids) => {
-      if (ids.length === 0) return;
-      pushHistory();
-      const idSet = new Set(ids);
-      set((state) => ({
-        annotations: state.annotations.filter((a) => !idSet.has(a.id)),
-        selectedAnnotationIds: [],
-        selectedId: idSet.has(state.selectedId ?? '') ? null : state.selectedId,
       }));
     },
 

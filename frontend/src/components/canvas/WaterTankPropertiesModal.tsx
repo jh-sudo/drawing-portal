@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useCanvasStore } from '../../store/canvasStore';
 import { useUiStore } from '../../store/uiStore';
 import {
@@ -110,6 +110,18 @@ export function WaterTankPropertiesModal({ tankId, onClose }: Props) {
   const mrlConfig = useUiStore((s) => s.mrlConfig);
 
   const [draft, setDraft] = useState<TankProperties>({ ...(tank?.tankProperties ?? {}) });
+
+  // Resync the draft if the store's tankProperties changes underneath us — e.g.
+  // an undo/redo fired while this modal is open (focus not in a text field).
+  // Without this, Save would silently re-apply the stale pre-undo values.
+  useEffect(() => {
+    if (!tank) {
+      onClose();
+      return;
+    }
+    setDraft({ ...(tank.tankProperties ?? {}) });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tank?.tankProperties]);
 
   if (!tank) return null;
 
