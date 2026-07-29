@@ -40,6 +40,9 @@ Thumbs.db
 # GSD planning directory (local only)
 .planning/
 
+# Dev progress log (local only)
+PROGRESS.md
+
 # Root-level schematic exports (samples live in docs/examples/)
 schematic_*.json
 schematic_*.jpg
