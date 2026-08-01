@@ -183,6 +183,30 @@ interface ElementsLayerProps {
   onElementDblClick?: (id: string) => void;
   rubberBand?: RubberBandRect | null;
   onAnnotationDblClick?: (id: string, x: number, y: number, text: string, fontSize: number, maxWidth: number, height: number) => void;
+  /** Current Stage zoom level — used to keep warning badges/tooltips a constant screen size regardless of zoom. */
+  stageScale?: number;
+  /** Stage pan offset (Stage's own x/y are -stageOffsetX/-stageOffsetY) — needed together
+   *  with stageScale/viewport size to keep the warning tooltip clamped on-screen. */
+  stageOffsetX?: number;
+  stageOffsetY?: number;
+  /** Stage viewport pixel size — the warning tooltip is clamped against these bounds so it
+   *  can't render off-screen near the canvas edges. */
+  viewportWidth?: number;
+  viewportHeight?: number;
+}
+
+// Warning-badge (the orange "!" circle) constant on-screen size, in pixels — kept fixed
+// regardless of zoom by counter-scaling the badge's Group against stageScale.
+const BADGE_RADIUS_PX = 9;
+const BADGE_FONT_PX = 15;
+// Gap between the symbol's edge and the badge, in screen pixels — also kept constant
+// regardless of zoom (see badgeGap below) so the badge doesn't visually drift away from
+// its symbol as the user zooms in.
+const BADGE_GAP_PX = 4;
+
+function setBadgeCursor(e: Konva.KonvaEventObject<MouseEvent>, cursor: string) {
+  const stage = (e.target as Konva.Node).getStage();
+  if (stage) stage.container().style.cursor = cursor;
 }
 
 /**
@@ -202,7 +226,19 @@ function portLabelOffset(relX: number, relY: number): { dx: number; dy: number }
     : { dx: -4, dy:  4 };   // bottom port
 }
 
-export function ElementsLayer({ dragPreview, templateGhost, onElementClick, onElementDblClick, rubberBand, onAnnotationDblClick }: ElementsLayerProps) {
+export function ElementsLayer({
+  dragPreview, templateGhost, onElementClick, onElementDblClick, rubberBand, onAnnotationDblClick,
+  stageScale = 1, stageOffsetX = 0, stageOffsetY = 0, viewportWidth = Infinity, viewportHeight = Infinity,
+}: ElementsLayerProps) {
+  // Badges/tooltips are drawn in world (content) coordinates like everything else in this
+  // layer, but we counter-scale their own Group so their on-screen pixel size stays constant
+  // regardless of zoom — otherwise both the click target and the tooltip text shrink into
+  // unusability when the user zooms out.
+  const badgeInvScale = 1 / (stageScale || 1);
+  // Content-space distance that renders as a constant BADGE_GAP_PX on screen — since the
+  // symbol edge itself (symPx/2) already scales correctly with zoom like everything else
+  // in content space, only this extra gap term needs the counter-scale treatment.
+  const badgeGap = BADGE_GAP_PX * badgeInvScale;
   const elements = useCanvasStore((s) => s.elements);
   const pipes = useCanvasStore((s) => s.pipes);
   const selectedId = useCanvasStore((s) => s.selectedId);
@@ -453,23 +489,32 @@ export function ElementsLayer({ dragPreview, templateGhost, onElementClick, onEl
       {elements.flatMap((el) => {
         if (el.symbolId !== 'long_bath') return [];
         if (el.longBathCapacityL) return []; // capacity is set — no badge
-        const bx = el.x + symPx / 2 + 4;
-        const by = el.y - symPx / 2 - 4;
+        const bx = el.x + symPx / 2 + badgeGap;
+        const by = el.y - symPx / 2 - badgeGap;
         return [
-          <Circle
-            key={`lb-nocap-badge-${el.id}`}
-            x={bx} y={by} radius={4}
-            fill="#f97316" stroke="#fff" strokeWidth={1}
-            onMouseEnter={() => setWarningTooltip({ x: bx, y: by, lines: ['Long Bath Capacity Not Set', 'Capacity must be indicated on drawing (PUB requirement)', 'Double-click symbol to enter capacity'] })}
-            onMouseLeave={() => setWarningTooltip(null)}
-            onClick={() => { setWarningTooltip(null); setSelected(el.id); onElementDblClick?.(el.id); }}
-          />,
-          <Text
-            key={`lb-nocap-text-${el.id}`}
-            x={bx - 1.3} y={by - 3}
-            text="!" fontSize={8} fontStyle="bold" fill="#fff"
-            listening={false}
-          />,
+          <Group key={`lb-nocap-badge-${el.id}`} x={bx} y={by} scaleX={badgeInvScale} scaleY={badgeInvScale}>
+            <Circle
+              radius={BADGE_RADIUS_PX}
+              fill="#f97316" stroke="#fff" strokeWidth={1}
+              onMouseEnter={(e) => { setWarningTooltip({ x: bx, y: by, lines: ['Long Bath Capacity Not Set', 'Capacity must be indicated on drawing (PUB requirement)', 'Click here to enter capacity'] }); setBadgeCursor(e, 'pointer'); }}
+              onMouseLeave={(e) => { setWarningTooltip(null); setBadgeCursor(e, 'default'); }}
+              onClick={() => {
+                // Long bath uses its own dedicated LongBathPanel (opened via onElementClick),
+                // not the generic SymbolPropertiesModal (onElementDblClick) — that modal is
+                // gated to dual-supply/MWELS/pump symbols only and silently no-ops for
+                // long_bath, which used to make this badge's click do nothing.
+                setWarningTooltip(null);
+                setSelected(el.id);
+                onElementClick?.(el.id, el.symbolId);
+              }}
+            />
+            <Text
+              x={-BADGE_RADIUS_PX} y={-BADGE_RADIUS_PX} width={BADGE_RADIUS_PX * 2} height={BADGE_RADIUS_PX * 2}
+              align="center" verticalAlign="middle"
+              text="!" fontSize={BADGE_FONT_PX} fontStyle="bold" fill="#fff"
+              listening={false}
+            />
+          </Group>,
         ];
       })}
 
@@ -477,22 +522,23 @@ export function ElementsLayer({ dragPreview, templateGhost, onElementClick, onEl
       {elements.flatMap((el) => {
         if (el.symbolId !== 'long_bath') return [];
         if (!el.longBathCapacityL || el.longBathCapacityL <= 250) return [];
-        const bx = el.x + symPx / 2 + 4;
-        const by = el.y - symPx / 2 - 4;
+        const bx = el.x + symPx / 2 + badgeGap;
+        const by = el.y - symPx / 2 - badgeGap;
         return [
-          <Circle
-            key={`lb-badge-${el.id}`}
-            x={bx} y={by} radius={4}
-            fill="#f97316" stroke="#fff" strokeWidth={1}
-            onMouseEnter={() => setWarningTooltip({ x: bx, y: by, lines: ['Capacity exceeds 250 L (SS636 §6.2)', 'Recycling facilities required — no drain plug, full recirculation, backwash to sewer'] })}
-            onMouseLeave={() => setWarningTooltip(null)}
-          />,
-          <Text
-            key={`lb-text-${el.id}`}
-            x={bx - 1.3} y={by - 3}
-            text="!" fontSize={8} fontStyle="bold" fill="#fff"
-            listening={false}
-          />,
+          <Group key={`lb-badge-${el.id}`} x={bx} y={by} scaleX={badgeInvScale} scaleY={badgeInvScale}>
+            <Circle
+              radius={BADGE_RADIUS_PX}
+              fill="#f97316" stroke="#fff" strokeWidth={1}
+              onMouseEnter={(e) => { setWarningTooltip({ x: bx, y: by, lines: ['Capacity exceeds 250 L (SS636 §6.2)', 'Recycling facilities required — no drain plug, full recirculation, backwash to sewer'] }); setBadgeCursor(e, 'pointer'); }}
+              onMouseLeave={(e) => { setWarningTooltip(null); setBadgeCursor(e, 'default'); }}
+            />
+            <Text
+              x={-BADGE_RADIUS_PX} y={-BADGE_RADIUS_PX} width={BADGE_RADIUS_PX * 2} height={BADGE_RADIUS_PX * 2}
+              align="center" verticalAlign="middle"
+              text="!" fontSize={BADGE_FONT_PX} fontStyle="bold" fill="#fff"
+              listening={false}
+            />
+          </Group>,
         ];
       })}
 
@@ -502,44 +548,43 @@ export function ElementsLayer({ dragPreview, templateGhost, onElementClick, onEl
         if (isElementProtected(el, elementAdj, elemById, 6, elements, pipes)) return [];
         const halfW = (el.width ?? symPx) / 2;
         const halfH = (el.height ?? symPx) / 2;
-        const bx = el.x + halfW + 4;
-        const by = el.y - halfH - 4;
+        const bx = el.x + halfW + badgeGap;
+        const by = el.y - halfH - badgeGap;
         const rule = getBackflowRule(el);
         const ttLines = rule === 'vb_and_check_valve'
           ? ['Backflow Risk (SS636 §6.5)', 'Requires a vacuum breaker and check valve connected in series', 'Double-click to insert Gate Valve + Check Valve + Vacuum Breaker']
           : ['Backflow Risk (SS636 §6.4)', 'Requires 2 check valves connected in series upstream', 'Double-click to insert Gate Valve + 2 Check Valves'];
         return [
-          <Circle
-            key={`bf-badge-${el.id}`}
-            x={bx} y={by} radius={4}
-            fill="#f97316" stroke="#fff" strokeWidth={1}
-            onMouseEnter={(e) => {
-              setWarningTooltip({ x: bx, y: by, lines: ttLines });
-              const stage = (e.target as Konva.Node).getStage();
-              if (stage) stage.container().style.cursor = 'pointer';
-            }}
-            onMouseLeave={(e) => {
-              setWarningTooltip(null);
-              const stage = (e.target as Konva.Node).getStage();
-              if (stage) stage.container().style.cursor = 'default';
-            }}
-            onDblClick={(e) => {
-              e.cancelBubble = true;
-              setWarningTooltip(null);
-              const asms = buildBackflowAssemblies(el.id, '', elements, pipes);
-              if (asms.length > 0) {
-                insertDcvAssemblies(asms.map((a) => ({
-                  elements: a.elements, targetPipeId: a.targetPipeId, snapX: a.snapX, snapY: a.snapY,
-                })));
-              }
-            }}
-          />,
-          <Text
-            key={`bf-text-${el.id}`}
-            x={bx - 1.3} y={by - 3}
-            text="!" fontSize={8} fontStyle="bold" fill="#fff"
-            listening={false}
-          />,
+          <Group key={`bf-badge-${el.id}`} x={bx} y={by} scaleX={badgeInvScale} scaleY={badgeInvScale}>
+            <Circle
+              radius={BADGE_RADIUS_PX}
+              fill="#f97316" stroke="#fff" strokeWidth={1}
+              onMouseEnter={(e) => {
+                setWarningTooltip({ x: bx, y: by, lines: ttLines });
+                setBadgeCursor(e, 'pointer');
+              }}
+              onMouseLeave={(e) => {
+                setWarningTooltip(null);
+                setBadgeCursor(e, 'default');
+              }}
+              onDblClick={(e) => {
+                e.cancelBubble = true;
+                setWarningTooltip(null);
+                const asms = buildBackflowAssemblies(el.id, '', elements, pipes);
+                if (asms.length > 0) {
+                  insertDcvAssemblies(asms.map((a) => ({
+                    elements: a.elements, targetPipeId: a.targetPipeId, snapX: a.snapX, snapY: a.snapY,
+                  })));
+                }
+              }}
+            />
+            <Text
+              x={-BADGE_RADIUS_PX} y={-BADGE_RADIUS_PX} width={BADGE_RADIUS_PX * 2} height={BADGE_RADIUS_PX * 2}
+              align="center" verticalAlign="middle"
+              text="!" fontSize={BADGE_FONT_PX} fontStyle="bold" fill="#fff"
+              listening={false}
+            />
+          </Group>,
         ];
       })}
 
@@ -549,23 +594,24 @@ export function ElementsLayer({ dragPreview, templateGhost, onElementClick, onEl
         const mwelsCategory = FIXTURE_MWELS_CATEGORY[el.symbolId];
         if (mwelsCategory && NON_MWELS_FITTING_TYPE_IDS.has(mwelsCategory)) return [];
         if (el.efficiencyRating) return [];
-        const bx = el.x + symPx / 2 + 4;
-        const by = el.y - symPx / 2 - 4;
+        const bx = el.x + symPx / 2 + badgeGap;
+        const by = el.y - symPx / 2 - badgeGap;
         return [
-          <Circle
-            key={`mwels-badge-${el.id}`}
-            x={bx} y={by} radius={4}
-            fill="#f97316" stroke="#fff" strokeWidth={1}
-            onMouseEnter={() => setWarningTooltip({ x: bx, y: by, lines: ['MWELS Rating Missing', 'Double-click symbol to set efficiency ticks'] })}
-            onMouseLeave={() => setWarningTooltip(null)}
-            onClick={() => { setWarningTooltip(null); setSelected(el.id); onElementDblClick?.(el.id); }}
-          />,
-          <Text
-            key={`mwels-text-${el.id}`}
-            x={bx - 1.3} y={by - 3}
-            text="!" fontSize={8} fontStyle="bold" fill="#fff"
-            listening={false}
-          />,
+          <Group key={`mwels-badge-${el.id}`} x={bx} y={by} scaleX={badgeInvScale} scaleY={badgeInvScale}>
+            <Circle
+              radius={BADGE_RADIUS_PX}
+              fill="#f97316" stroke="#fff" strokeWidth={1}
+              onMouseEnter={(e) => { setWarningTooltip({ x: bx, y: by, lines: ['MWELS Rating Missing', 'Click here to set efficiency ticks'] }); setBadgeCursor(e, 'pointer'); }}
+              onMouseLeave={(e) => { setWarningTooltip(null); setBadgeCursor(e, 'default'); }}
+              onClick={() => { setWarningTooltip(null); setSelected(el.id); onElementDblClick?.(el.id); }}
+            />
+            <Text
+              x={-BADGE_RADIUS_PX} y={-BADGE_RADIUS_PX} width={BADGE_RADIUS_PX * 2} height={BADGE_RADIUS_PX * 2}
+              align="center" verticalAlign="middle"
+              text="!" fontSize={BADGE_FONT_PX} fontStyle="bold" fill="#fff"
+              listening={false}
+            />
+          </Group>,
         ];
       })}
 
@@ -573,23 +619,24 @@ export function ElementsLayer({ dragPreview, templateGhost, onElementClick, onEl
       {elements.flatMap((el) => {
         if (el.symbolId !== 'pump') return [];
         if (el.pumpRatedHeadM !== undefined) return [];
-        const bx = el.x + symPx / 2 + 4;
-        const by = el.y - symPx / 2 - 4;
+        const bx = el.x + symPx / 2 + badgeGap;
+        const by = el.y - symPx / 2 - badgeGap;
         return [
-          <Circle
-            key={`pump-head-badge-${el.id}`}
-            x={bx} y={by} radius={4}
-            fill="#f97316" stroke="#fff" strokeWidth={1}
-            onMouseEnter={() => setWarningTooltip({ x: bx, y: by, lines: ['Pump Rated Head Not Declared', 'Double-click symbol to enter rated head (m) from pump schedule'] })}
-            onMouseLeave={() => setWarningTooltip(null)}
-            onClick={() => { setWarningTooltip(null); setSelected(el.id); onElementDblClick?.(el.id); }}
-          />,
-          <Text
-            key={`pump-head-text-${el.id}`}
-            x={bx - 1.3} y={by - 3}
-            text="!" fontSize={8} fontStyle="bold" fill="#fff"
-            listening={false}
-          />,
+          <Group key={`pump-head-badge-${el.id}`} x={bx} y={by} scaleX={badgeInvScale} scaleY={badgeInvScale}>
+            <Circle
+              radius={BADGE_RADIUS_PX}
+              fill="#f97316" stroke="#fff" strokeWidth={1}
+              onMouseEnter={(e) => { setWarningTooltip({ x: bx, y: by, lines: ['Pump Rated Head Not Declared', 'Click here to enter rated head (m) from pump schedule'] }); setBadgeCursor(e, 'pointer'); }}
+              onMouseLeave={(e) => { setWarningTooltip(null); setBadgeCursor(e, 'default'); }}
+              onClick={() => { setWarningTooltip(null); setSelected(el.id); onElementDblClick?.(el.id); }}
+            />
+            <Text
+              x={-BADGE_RADIUS_PX} y={-BADGE_RADIUS_PX} width={BADGE_RADIUS_PX * 2} height={BADGE_RADIUS_PX * 2}
+              align="center" verticalAlign="middle"
+              text="!" fontSize={BADGE_FONT_PX} fontStyle="bold" fill="#fff"
+              listening={false}
+            />
+          </Group>,
         ];
       })}
 
@@ -783,30 +830,66 @@ export function ElementsLayer({ dragPreview, templateGhost, onElementClick, onEl
       })}
       {/* Warning tooltip — shown on hover over ! badges */}
       {warningTooltip && (() => {
-        const PAD = 1.5;
-        const LINE_H = 2.5;
-        const W = 36;
-        const H = warningTooltip.lines.length * LINE_H + PAD * 2;
+        // Fixed screen-pixel layout — the outer Group counter-scales against stageScale
+        // (same badgeInvScale used for the "!" badges) so the tooltip stays readable at
+        // any zoom level instead of shrinking along with the drawing.
+        const PAD = 8;
+        const LINE_GAP = 6;
+        const W = 240;
+        const FONT = 12;
+        const textWidth = W - PAD * 2;
+        // Longer lines word-wrap to multiple visual rows — measure each line's actual
+        // wrapped height (via a throwaway Konva.Text, same as what's rendered below)
+        // instead of assuming one row per entry, otherwise wrapped rows overlap the
+        // next tooltip line.
+        let cursorY = PAD;
+        const measured = warningTooltip.lines.map((line, i) => {
+          const probe = new Konva.Text({
+            text: line, fontSize: FONT, width: textWidth, wrap: 'word',
+            fontStyle: i === 0 ? 'bold' : 'normal',
+          });
+          const h = probe.height();
+          const y = cursorY;
+          cursorY += h + LINE_GAP;
+          return { line, y, h };
+        });
+        const H = cursorY - LINE_GAP + PAD;
+
+        // Clamp the tooltip box to the visible Stage viewport — it's a fixed screen-pixel
+        // box now (unlike before, when it shrank along with zoom-out and rarely overflowed),
+        // so a badge near the sheet's top/right edge at a small stageScale can otherwise
+        // push it partly or fully off-screen where it's invisible.
+        const EDGE_MARGIN = 6;
+        const anchorScreenX = warningTooltip.x * stageScale - stageOffsetX;
+        const anchorScreenY = warningTooltip.y * stageScale - stageOffsetY;
+        let localX = 8;
+        let localY = -H - 6;
+        localX = Math.max(EDGE_MARGIN - anchorScreenX, Math.min(localX, viewportWidth - W - EDGE_MARGIN - anchorScreenX));
+        if (anchorScreenY + localY < EDGE_MARGIN) localY = 2 * BADGE_RADIUS_PX + 6; // no room above — flip below the badge
+        localY = Math.max(EDGE_MARGIN - anchorScreenY, Math.min(localY, viewportHeight - H - EDGE_MARGIN - anchorScreenY));
+
         return (
-          <Group x={warningTooltip.x + 8} y={warningTooltip.y - H - 6} listening={false}>
-            <Rect
-              x={0} y={0} width={W} height={H}
-              fill="#1f2937" cornerRadius={3} opacity={0.93}
-              shadowColor="black" shadowBlur={6} shadowOpacity={0.25} shadowOffsetY={1}
-            />
-            {warningTooltip.lines.map((line, i) => (
-              <Text
-                key={i}
-                x={PAD} y={PAD + i * LINE_H}
-                text={line}
-                fontSize={1}
-                fill={i === 0 ? '#fbbf24' : '#d1d5db'}
-                fontStyle={i === 0 ? 'bold' : 'normal'}
-                width={W - PAD * 2}
-                wrap="word"
-                listening={false}
+          <Group x={warningTooltip.x} y={warningTooltip.y} scaleX={badgeInvScale} scaleY={badgeInvScale} listening={false}>
+            <Group x={localX} y={localY}>
+              <Rect
+                x={0} y={0} width={W} height={H}
+                fill="#1f2937" cornerRadius={4} opacity={0.93}
+                shadowColor="black" shadowBlur={6} shadowOpacity={0.25} shadowOffsetY={1}
               />
-            ))}
+              {measured.map((m, i) => (
+                <Text
+                  key={i}
+                  x={PAD} y={m.y}
+                  text={m.line}
+                  fontSize={FONT}
+                  fill={i === 0 ? '#fbbf24' : '#d1d5db'}
+                  fontStyle={i === 0 ? 'bold' : 'normal'}
+                  width={textWidth}
+                  wrap="word"
+                  listening={false}
+                />
+              ))}
+            </Group>
           </Group>
         );
       })()}

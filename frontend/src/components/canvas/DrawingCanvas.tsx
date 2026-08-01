@@ -1550,6 +1550,11 @@ export function DrawingCanvas({ onSizeChange }: DrawingCanvasProps) {
         />
         <LpPeStampLayer sheetConfig={sheetConfig} />
         <ElementsLayer
+          stageScale={stageScale}
+          stageOffsetX={stageOffsetX}
+          stageOffsetY={stageOffsetY}
+          viewportWidth={canvasSize.width}
+          viewportHeight={canvasSize.height}
           dragPreview={draggingSymbolId && dragOverPos
             ? { symbolId: draggingSymbolId, x: dragOverPos.x, y: dragOverPos.y }
             : null}
