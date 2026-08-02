@@ -25,7 +25,7 @@ interface ConnectionWarning {
 }
 
 // TODO: replace with the real FormSG link once it's ready.
-const BUG_REPORT_URL = 'https://www.google.com/';
+const BUG_REPORT_URL = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ';
 
 // Personal escape hatch for the admin's own testing — visit once with
 // ?skipFeedback=1 and it's remembered in this browser via localStorage.
