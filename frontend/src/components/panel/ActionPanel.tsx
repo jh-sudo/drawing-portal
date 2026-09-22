@@ -338,6 +338,17 @@ export function ActionPanel({ canvasWidth, canvasHeight }: ActionPanelProps) {
         Clear Canvas
       </button>
 
+      <div style={{ borderTop: '1px solid #e8e8e8', paddingTop: 12, marginTop: 12 }} />
+      <div
+        style={{
+          display: 'block', width: '100%', padding: '7px 12px', border: '1px solid #ddd',
+          borderRadius: 6, background: '#f9fafb', color: '#9ca3af',
+          fontSize: 13, textAlign: 'center', boxSizing: 'border-box',
+        }}
+      >
+        Report a Bug / Feedback
+      </div>
+
       <ConfirmDialog
         isOpen={confirmClear}
         title="Clear Canvas"
