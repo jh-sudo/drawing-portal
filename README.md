@@ -106,14 +106,13 @@ The backend has a pytest suite, one file per compliance check plus the evaluate/
 
 ## Environment Variables
 
-### Backend (`backend/.env`, optional — gitignored)
+### Backend (optional)
 
 | Variable | Default | Description |
 |---|---|---|
-| `SLACK_FEEDBACK_WEBHOOK_URL` | *(unset)* | Slack Incoming Webhook that receives early-tester feedback. Feedback is always printed to stdout as well. |
 | `SYMBOLS_PATH` | `<backend>/symbols` | Path to the symbols directory (SVG library + `manifest.json`) |
 
-Neither needs to be set for local development.
+Nothing needs to be set for local development.
 
 ### Frontend (build-time)
 
@@ -202,7 +201,6 @@ drawing-portal/
 ├── start.sh / stop.sh                # Local dev scripts
 ├── docker-compose.yml                # Self-hosted production-style stack
 ├── docker-compose.override.yml       # Dev overrides (auto-applied by `docker compose up`)
-├── scripts/export_slack_feedback.py  # Pulls tester feedback from Slack into a CSV
 │
 ├── backend/
 │   ├── Dockerfile / Dockerfile.dev
@@ -210,7 +208,7 @@ drawing-portal/
 │   ├── requirements.txt
 │   ├── app/
 │   │   ├── main.py                   # FastAPI app — health, symbols, evaluate, feedback, export routers
-│   │   ├── config.py                 # Settings (pydantic-settings, reads backend/.env)
+│   │   ├── config.py                 # Settings (pydantic-settings)
 │   │   ├── agents/                   # Compliance checks (deterministic, no LLM)
 │   │   │   ├── compliance_checks.py      # REG28 (backflow), SEC221 (supply mode), SEC721 (MWELS)
 │   │   │   ├── hot_water_contamination_check.py
@@ -329,7 +327,7 @@ Types for every field are in `frontend/src/types/index.ts` (`DrawingMetadata`). 
 ### Production (Airbase)
 Both services deploy to Airbase as containers, configured by `backend/airbase.json` (`soar/sdp-be`, port 8000) and `frontend/airbase.json` (`soar/spd-fe-2`, port 3000).
 
-- **Backend:** `backend/Dockerfile` optionally bakes `backend/.env` (gitignored) into the image, since Airbase has no runtime secrets UI. Create it locally before deploying if you need the Slack webhook.
+- **Backend:** built from `backend/Dockerfile`.
 - **Frontend:** `frontend/Dockerfile` serves a **prebuilt** `dist/` folder, so run `npm run build` in `frontend/` before deploying. The API URL is baked in at build time from `frontend/.env.production`.
 
 ### Docker Compose (self-hosted)
