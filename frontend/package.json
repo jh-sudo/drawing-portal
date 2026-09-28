@@ -10,6 +10,7 @@
     "lint": "eslint src --ext ts,tsx"
   },
   "dependencies": {
+    "@govtechsg/sgds-web-component": "^3.29.0",
     "axios": "^1.7.2",
     "jspdf": "^4.2.1",
     "konva": "^9.3.6",

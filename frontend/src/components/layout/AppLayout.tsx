@@ -12,6 +12,9 @@ export function AppLayout() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
+      {/* Singapore Government masthead (SGDS web component, registered in main.tsx) */}
+      <sgds-masthead style={{ flexShrink: 0 }} />
+
       {/* Header */}
       <div style={{
         height: 48, background: '#1a3a5c', color: '#fff',
