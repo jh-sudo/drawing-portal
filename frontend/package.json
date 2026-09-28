@@ -13,7 +13,6 @@
     "axios": "^1.7.2",
     "jspdf": "^4.2.1",
     "konva": "^9.3.6",
-    "pdfjs-dist": "^5.7.284",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-konva": "^18.2.10",

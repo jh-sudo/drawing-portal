@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { useCanvasStore } from '../../store/canvasStore';
 import { useMetadataExport } from '../../hooks/useMetadataExport';
 import { useJsonImport } from '../../hooks/useJsonImport';
@@ -12,7 +12,6 @@ import { getUnconnectedPorts } from '../../utils/portConnectionStatus';
 import { evaluationApi } from '../../api/client';
 import type { EvaluationResponse } from '../../types/evaluation';
 import type { AcknowledgmentFlags, DrawingMetadata } from '../../types';
-import { PAPER_SIZES_MM, SHEET_PX_PER_MM, AXIS_WIDTH } from '../../types';
 
 
 interface ActionPanelProps {
@@ -44,11 +43,6 @@ export function ActionPanel({ canvasWidth, canvasHeight }: ActionPanelProps) {
   const sheetConfig = useUiStore((s) => s.sheetConfig);
   const elements = useCanvasStore((s) => s.elements);
   const pipes = useCanvasStore((s) => s.pipes);
-  const pdfBackground = useUiStore((s) => s.pdfBackground);
-  const setPdfBackground = useUiStore((s) => s.setPdfBackground);
-  const updatePdfBackground = useUiStore((s) => s.updatePdfBackground);
-  const pdfImportFn = useUiStore((s) => s.pdfImportFn);
-  const pdfFileInputRef = useRef<HTMLInputElement>(null);
   const resetTitleBlock = useUiStore((s) => s.resetTitleBlock);
   const [confirmClear, setConfirmClear] = useState(false);
   const [clearTitleBlock, setClearTitleBlock] = useState(false);
@@ -122,17 +116,6 @@ export function ActionPanel({ canvasWidth, canvasHeight }: ActionPanelProps) {
 
   const hasContent = elements.length > 0 || pipes.length > 0;
 
-  const handlePdfFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    e.target.value = '';
-    try {
-      await pdfImportFn?.(file);
-    } catch (err) {
-      setEvalError(err instanceof Error ? err.message : 'PDF import failed');
-    }
-  };
-
   return (
     <div style={{ borderTop: '1px solid #e8e8e8', paddingTop: 12, marginTop: 12 }}>
 
@@ -169,108 +152,6 @@ export function ActionPanel({ canvasWidth, canvasHeight }: ActionPanelProps) {
         >
           Browse Templates
         </button>
-      </div>
-      <div style={{ borderTop: '1px solid #e8e8e8', paddingTop: 12, marginBottom: 12 }} />
-
-      {/* PDF Background section */}
-      <div style={{ marginBottom: 12 }}>
-        <div style={{ fontSize: 11, fontWeight: 600, color: '#6b7280', textTransform: 'uppercase', letterSpacing: 0.6, marginBottom: 6 }}>
-          PDF Background
-        </div>
-        <button
-          onClick={() => pdfFileInputRef.current?.click()}
-          style={{
-            width: '100%', padding: '7px 12px', border: '1px solid #bbb',
-            borderRadius: 6, background: '#fff', color: '#374151',
-            cursor: 'pointer', fontSize: 13, marginBottom: 6,
-          }}
-        >
-          {pdfBackground ? 'Replace PDF' : 'Import PDF'}
-        </button>
-        {pdfBackground && (
-          <>
-            <div style={{ display: 'flex', gap: 6, marginBottom: 6 }}>
-              <button
-                onClick={() => {
-                  const vw = AXIS_WIDTH + PAPER_SIZES_MM[sheetConfig.paperSize].w * SHEET_PX_PER_MM;
-                  const vh = PAPER_SIZES_MM[sheetConfig.paperSize].h * SHEET_PX_PER_MM;
-                  const scale = Math.min(vw / pdfBackground.width, vh / pdfBackground.height);
-                  updatePdfBackground({
-                    x: vw / 2,
-                    y: vh / 2,
-                    width: pdfBackground.width * scale,
-                    height: pdfBackground.height * scale,
-                  });
-                }}
-                title="Scale PDF to fill the canvas (keeps aspect ratio)"
-                style={{
-                  flex: 1, padding: '6px 0', border: '1px solid #bbb',
-                  borderRadius: 6, background: '#fff', color: '#374151',
-                  cursor: 'pointer', fontSize: 12,
-                }}
-              >
-                Fit to canvas
-              </button>
-              <button
-                onClick={() => updatePdfBackground({ rotation: (pdfBackground.rotation + 90) % 360 })}
-                title="Rotate 90° clockwise"
-                style={{
-                  flex: 1, padding: '6px 0', border: '1px solid #bbb',
-                  borderRadius: 6, background: '#fff', color: '#374151',
-                  cursor: 'pointer', fontSize: 12,
-                }}
-              >
-                Rotate 90°
-              </button>
-            </div>
-            <div style={{ display: 'flex', gap: 6, marginBottom: 6 }}>
-              <button
-                onClick={() => updatePdfBackground({ locked: !pdfBackground.locked })}
-                title={pdfBackground.locked ? 'Unlock to move/resize' : 'Lock in place'}
-                style={{
-                  flex: 1, padding: '6px 0', border: '1px solid #bbb',
-                  borderRadius: 6, background: pdfBackground.locked ? '#e0f2fe' : '#fff',
-                  color: '#374151', cursor: 'pointer', fontSize: 12,
-                }}
-              >
-                {pdfBackground.locked ? 'Unlock' : 'Lock'}
-              </button>
-              <button
-                onClick={() => setPdfBackground(null)}
-                title="Remove PDF background"
-                style={{
-                  flex: 1, padding: '6px 0', border: '1px solid #fca5a5',
-                  borderRadius: 6, background: '#fff', color: '#dc2626',
-                  cursor: 'pointer', fontSize: 12,
-                }}
-              >
-                Remove
-              </button>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span style={{ fontSize: 11, color: '#6b7280', whiteSpace: 'nowrap' }}>Opacity</span>
-              <input
-                type="range"
-                min={0.05}
-                max={1}
-                step={0.05}
-                value={pdfBackground.opacity}
-                onChange={(e) => updatePdfBackground({ opacity: parseFloat(e.target.value) })}
-                style={{ flex: 1, accentColor: '#7c3aed' }}
-              />
-              <span style={{ fontSize: 11, color: '#6b7280', minWidth: 28, textAlign: 'right' }}>
-                {Math.round(pdfBackground.opacity * 100)}%
-              </span>
-            </div>
-          </>
-        )}
-        <input
-          ref={pdfFileInputRef}
-          type="file"
-          accept=".pdf,application/pdf"
-          style={{ display: 'none' }}
-          onChange={handlePdfFileChange}
-        />
       </div>
       <div style={{ borderTop: '1px solid #e8e8e8', paddingTop: 12, marginBottom: 8 }} />
 

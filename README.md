@@ -205,12 +205,12 @@ schematic-drawing-portal-master/
 │   ├── package.json / vite.config.ts
 │   └── src/
 │       ├── components/
-│       │   ├── canvas/                   # Drawing canvas: DrawingCanvas, ElementsLayer, GridLayer, port/rotation dialogs, PDF background layer, title block
+│       │   ├── canvas/                   # Drawing canvas: DrawingCanvas, ElementsLayer, GridLayer, port/rotation dialogs, title block
 │       │   ├── panel/                    # SymbolPalette, ActionPanel, MrlConfigPanel (elevation + floor levels), PipeColorPanel, PipeDiameterPanel
 │       │   ├── common/                   # AcknowledgmentModal, EvaluationModal, SheetSetupModal, TemplateModal, FeedbackModal
 │       │   └── chat/                     # Compliance-results display components (EvaluationReport, ComplianceCheckCard, WelsTable)
 │       ├── store/                    # Zustand: canvasStore.ts (elements/pipes/annotations/undo-redo), uiStore.ts (tool/mRL/sheet/floor levels)
-│       ├── utils/                    # metadataBuilder, symbolPorts, mrlMapping, geometry, fluidInference, pipeJumps, pdfRenderer, pdfVectorExport
+│       ├── utils/                    # metadataBuilder, symbolPorts, mrlMapping, geometry, fluidInference, pipeJumps, pdfVectorExport
 │       ├── data/templates.ts         # Pre-built schematic templates
 │       ├── hooks/                    # useCanvasInteraction, useMetadataExport, useJsonImport, useSymbols
 │       └── types/index.ts            # All shared types
@@ -289,7 +289,7 @@ docker-compose up --build
 | Layer | Technology |
 |---|---|
 | Frontend | React 18, TypeScript, Vite, react-konva (Konva.js canvas), Zustand, Axios |
-| PDF | jsPDF + svg2pdf.js (vector diagram export), pdfjs-dist (tracing-background import) |
+| PDF | jsPDF + svg2pdf.js (vector diagram export) |
 | Backend | Python 3.12, FastAPI, Uvicorn |
 | Compliance engine | Deterministic Python — BFS/graph traversal over schematic topology, no LLM |
 | Document export | python-docx (Word non-compliance report), Pillow (annotated-image generation) |

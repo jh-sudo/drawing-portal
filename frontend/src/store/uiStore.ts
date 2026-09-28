@@ -11,17 +11,6 @@ export interface PendingTemplate {
   annotations: AnnotationElement[];
 }
 
-export interface PdfBackground {
-  dataUrl: string;
-  x: number;      // center x in content coords
-  y: number;      // center y in content coords
-  width: number;
-  height: number;
-  rotation: number;
-  locked: boolean;
-  opacity: number; // 0–1
-}
-
 export interface BidetToast {
   tapElementId: string;
   tapX: number;
@@ -52,8 +41,6 @@ interface UiStore {
   pendingTemplate: PendingTemplate | null;
   exportPdfFn: (() => void) | null;
   captureStageRegionFn: ((region: { x: number; y: number; width: number; height: number }, pixelRatio?: number) => string | null) | null;
-  pdfBackground: PdfBackground | null;
-  pdfImportFn: ((file: File) => Promise<void>) | null;
   sheetConfig: SheetConfig;
   sheetSetupOpen: boolean;
   sheetSetupInitialTab: 'sheet' | 'titleblock';
@@ -80,9 +67,6 @@ interface UiStore {
   setPendingTemplate: (t: PendingTemplate | null) => void;
   registerExportPdf: (fn: () => void) => void;
   registerCaptureStageRegion: (fn: (region: { x: number; y: number; width: number; height: number }, pixelRatio?: number) => string | null) => void;
-  setPdfBackground: (bg: PdfBackground | null) => void;
-  updatePdfBackground: (props: Partial<PdfBackground>) => void;
-  registerPdfImport: (fn: (file: File) => Promise<void>) => void;
   setSheetConfig: (cfg: SheetConfig) => void;
   setTitleBlock: (tb: TitleBlockData) => void;
   resetTitleBlock: () => void;
@@ -114,8 +98,6 @@ export const useUiStore = create<UiStore>()(persist((set, get) => ({
   pendingTemplate: null,
   exportPdfFn: null,
   captureStageRegionFn: null,
-  pdfBackground: null,
-  pdfImportFn: null,
   sheetConfig: DEFAULT_SHEET_CONFIG,
   sheetSetupOpen: true,
   sheetSetupInitialTab: 'sheet' as const,
@@ -133,11 +115,6 @@ export const useUiStore = create<UiStore>()(persist((set, get) => ({
   setPendingTemplate: (t) => set({ pendingTemplate: t }),
   registerExportPdf: (fn) => set({ exportPdfFn: fn }),
   registerCaptureStageRegion: (fn) => set({ captureStageRegionFn: fn }),
-  setPdfBackground: (bg) => set({ pdfBackground: bg }),
-  updatePdfBackground: (props) => set((state) => ({
-    pdfBackground: state.pdfBackground ? { ...state.pdfBackground, ...props } : null,
-  })),
-  registerPdfImport: (fn) => set({ pdfImportFn: fn }),
   setSheetConfig: (cfg) => {
     const { sheetConfig: prev, mrlConfig } = get();
     // Paper size alone (even with drawingScale unchanged) moves the canvas-bottom
