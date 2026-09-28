@@ -1,0 +1,1619 @@
+{
+  "schema_version": "1.0",
+  "exported_at": "2026-09-28T03:07:40.285Z",
+  "title_block": {
+    "ownerDeveloper": "Example Owner / Developer",
+    "professionalEngineer": "",
+    "projectName": "Example project — 2x pump manifold with bypass",
+    "mainContractor": "Example Main Contractor",
+    "licensedPlumber": "Example Licensed Plumber",
+    "drawingNo": "EX-001",
+    "drawnBy": "Example",
+    "checkedBy": "",
+    "date": "2026-09-28",
+    "rev": "-",
+    "projectNo": "",
+    "tenureOfLand": "",
+    "submissionType": "LP"
+  },
+  "mrl_config": {
+    "upper_mrl": 14.85,
+    "lower_mrl": 0,
+    "unit": "m AMSL",
+    "range": 14.85
+  },
+  "canvas": {
+    "width_px": 1104,
+    "height_px": 594
+  },
+  "sheet_config": {
+    "paper_size": "A3",
+    "drawing_scale": 50
+  },
+  "materials_acknowledged": false,
+  "pump_discharge_material_acknowledged": false,
+  "appliance_check_valve_acknowledged": false,
+  "bidet_vacuum_breaker_acknowledged": false,
+  "tank_position_acknowledged": false,
+  "elements": [
+    {
+      "id": "74d382c7-3467-4d51-8d60-0a7d3c7d5e41",
+      "type": "symbol",
+      "symbol_id": "tee_junction",
+      "symbol_name": "Tee Junction",
+      "node_type": "junction",
+      "position": {
+        "canvas_x": 485.45,
+        "canvas_y": 322.79
+      },
+      "width": 6,
+      "height": 6,
+      "elevation_m": 6.78,
+      "supply_mode": "direct_supply",
+      "rotation_deg": 90,
+      "scale_x": 1,
+      "ports": [
+        {
+          "index": 0,
+          "role": "downstream",
+          "label": "out",
+          "position": {
+            "canvas_x": 485.45,
+            "canvas_y": 319.79
+          },
+          "mrl": {
+            "value": 6.86,
+            "unit": "m AMSL"
+          },
+          "connected_pipe_id": null,
+          "connects_to_element_id": "618528ce-c815-4ce6-8761-6ea82bde750d",
+          "connects_to_port_index": 1,
+          "supply_mode": "direct_supply"
+        },
+        {
+          "index": 1,
+          "role": "upstream",
+          "label": "in",
+          "position": {
+            "canvas_x": 485.45,
+            "canvas_y": 325.79
+          },
+          "mrl": {
+            "value": 6.71,
+            "unit": "m AMSL"
+          },
+          "connected_pipe_id": null,
+          "connects_to_element_id": "566fc1cd-75d2-437c-8e67-e9bed54baa56",
+          "connects_to_port_index": 1,
+          "supply_mode": "direct_supply"
+        },
+        {
+          "index": 2,
+          "role": "downstream",
+          "label": "out",
+          "position": {
+            "canvas_x": 482.45,
+            "canvas_y": 322.79
+          },
+          "mrl": {
+            "value": 6.78,
+            "unit": "m AMSL"
+          },
+          "connected_pipe_id": "3ebeb963-a38d-4071-a46c-ec436c37387f",
+          "connects_to_element_id": "8bf18f82-3efb-4421-b143-61127c2cbdc5",
+          "connects_to_port_index": 0,
+          "supply_mode": "direct_supply"
+        }
+      ],
+      "connected_pipe_ids": [
+        "3ebeb963-a38d-4071-a46c-ec436c37387f"
+      ],
+      "upstream_port_index": 1,
+      "pipe_type": "cold"
+    },
+    {
+      "id": "0e1a44c1-a668-4f06-a1b9-97197215f34d",
+      "type": "symbol",
+      "symbol_id": "pump",
+      "symbol_name": "Pump",
+      "node_type": "pressure_booster",
+      "position": {
+        "canvas_x": 457.05,
+        "canvas_y": 322.72
+      },
+      "width": 10,
+      "height": 10,
+      "elevation_m": 6.78,
+      "supply_mode": "direct_supply",
+      "rotation_deg": 180,
+      "scale_x": 1,
+      "ports": [
+        {
+          "index": 0,
+          "role": "upstream",
+          "label": "Input",
+          "position": {
+            "canvas_x": 459.13,
+            "canvas_y": 322.72
+          },
+          "mrl": {
+            "value": 6.78,
+            "unit": "m AMSL"
+          },
+          "connected_pipe_id": null,
+          "connects_to_element_id": "186a816d-3cf2-46f5-8657-57d23396d20e",
+          "connects_to_port_index": 1,
+          "supply_mode": "direct_supply"
+        },
+        {
+          "index": 1,
+          "role": "downstream",
+          "label": "Output",
+          "position": {
+            "canvas_x": 454.55,
+            "canvas_y": 322.72
+          },
+          "mrl": {
+            "value": 6.78,
+            "unit": "m AMSL"
+          },
+          "connected_pipe_id": null,
+          "connects_to_element_id": "edd3b34f-22e8-4b53-ad06-0e8d309c6038",
+          "connects_to_port_index": 0,
+          "supply_mode": "direct_supply"
+        }
+      ],
+      "connected_pipe_ids": [],
+      "pump_rated_head_m": null
+    },
+    {
+      "id": "8bf18f82-3efb-4421-b143-61127c2cbdc5",
+      "type": "symbol",
+      "symbol_id": "gate_valve",
+      "symbol_name": "Gate Valve",
+      "node_type": "isolation_valve",
+      "position": {
+        "canvas_x": 474.05,
+        "canvas_y": 322.72
+      },
+      "width": 6,
+      "height": 6,
+      "elevation_m": 6.78,
+      "supply_mode": "direct_supply",
+      "rotation_deg": 180,
+      "scale_x": 1,
+      "ports": [
+        {
+          "index": 0,
+          "role": "upstream",
+          "label": "Input",
+          "position": {
+            "canvas_x": 477.05,
+            "canvas_y": 322.72
+          },
+          "mrl": {
+            "value": 6.78,
+            "unit": "m AMSL"
+          },
+          "connected_pipe_id": "3ebeb963-a38d-4071-a46c-ec436c37387f",
+          "connects_to_element_id": "74d382c7-3467-4d51-8d60-0a7d3c7d5e41",
+          "connects_to_port_index": 2,
+          "supply_mode": "direct_supply"
+        },
+        {
+          "index": 1,
+          "role": "downstream",
+          "label": "Output",
+          "position": {
+            "canvas_x": 471.05,
+            "canvas_y": 322.72
+          },
+          "mrl": {
+            "value": 6.78,
+            "unit": "m AMSL"
+          },
+          "connected_pipe_id": null,
+          "connects_to_element_id": "7a99b8a3-6938-4f08-a327-763783b2dbe9",
+          "connects_to_port_index": 0,
+          "supply_mode": "direct_supply"
+        }
+      ],
+      "connected_pipe_ids": [
+        "3ebeb963-a38d-4071-a46c-ec436c37387f"
+      ]
+    },
+    {
+      "id": "714e58d2-6989-458e-81b8-84aaadc46b33",
+      "type": "symbol",
+      "symbol_id": "gate_valve",
+      "symbol_name": "Gate Valve",
+      "node_type": "isolation_valve",
+      "position": {
+        "canvas_x": 446.05,
+        "canvas_y": 322.72
+      },
+      "width": 6,
+      "height": 6,
+      "elevation_m": 6.78,
+      "supply_mode": "direct_supply",
+      "rotation_deg": 180,
+      "scale_x": 1,
+      "ports": [
+        {
+          "index": 0,
+          "role": "upstream",
+          "label": "Input",
+          "position": {
+            "canvas_x": 449.05,
+            "canvas_y": 322.72
+          },
+          "mrl": {
+            "value": 6.78,
+            "unit": "m AMSL"
+          },
+          "connected_pipe_id": null,
+          "connects_to_element_id": "edd3b34f-22e8-4b53-ad06-0e8d309c6038",
+          "connects_to_port_index": 1,
+          "supply_mode": "direct_supply"
+        },
+        {
+          "index": 1,
+          "role": "downstream",
+          "label": "Output",
+          "position": {
+            "canvas_x": 443.05,
+            "canvas_y": 322.72
+          },
+          "mrl": {
+            "value": 6.78,
+            "unit": "m AMSL"
+          },
+          "connected_pipe_id": null,
+          "connects_to_element_id": "13967ce6-0d25-475b-8ba2-502d9a305735",
+          "connects_to_port_index": 2,
+          "supply_mode": "direct_supply"
+        }
+      ],
+      "connected_pipe_ids": []
+    },
+    {
+      "id": "82006b1f-ddf2-4918-b2ab-2b27ac3414f5",
+      "type": "symbol",
+      "symbol_id": "gate_valve",
+      "symbol_name": "Gate Valve",
+      "node_type": "isolation_valve",
+      "position": {
+        "canvas_x": 464.31,
+        "canvas_y": 337.21
+      },
+      "width": 6,
+      "height": 6,
+      "elevation_m": 6.42,
+      "supply_mode": "direct_supply",
+      "rotation_deg": 180,
+      "scale_x": 1,
+      "ports": [
+        {
+          "index": 0,
+          "role": "upstream",
+          "label": "Input",
+          "position": {
+            "canvas_x": 467.31,
+            "canvas_y": 337.21
+          },
+          "mrl": {
+            "value": 6.42,
+            "unit": "m AMSL"
+          },
+          "connected_pipe_id": "3e2f95ad-b8a7-4b8a-ac9f-b215346b99c1",
+          "connects_to_element_id": "a805551b-3ad4-4a54-bf25-941508a2aa69",
+          "connects_to_port_index": 1,
+          "supply_mode": "direct_supply"
+        },
+        {
+          "index": 1,
+          "role": "downstream",
+          "label": "Output",
+          "position": {
+            "canvas_x": 461.31,
+            "canvas_y": 337.21
+          },
+          "mrl": {
+            "value": 6.42,
+            "unit": "m AMSL"
+          },
+          "connected_pipe_id": null,
+          "connects_to_element_id": "eb5d1096-ba3a-4901-ad35-326acbaec4b8",
+          "connects_to_port_index": 0,
+          "supply_mode": "direct_supply"
+        }
+      ],
+      "connected_pipe_ids": [
+        "3e2f95ad-b8a7-4b8a-ac9f-b215346b99c1"
+      ]
+    },
+    {
+      "id": "edd3b34f-22e8-4b53-ad06-0e8d309c6038",
+      "type": "symbol",
+      "symbol_id": "flexible_connection",
+      "symbol_name": "Flexible Connection",
+      "node_type": "component",
+      "position": {
+        "canvas_x": 452.05,
+        "canvas_y": 322.72
+      },
+      "width": 6,
+      "height": 6,
+      "elevation_m": 6.78,
+      "supply_mode": "direct_supply",
+      "rotation_deg": 180,
+      "scale_x": 1,
+      "ports": [
+        {
+          "index": 0,
+          "role": "upstream",
+          "label": "Input",
+          "position": {
+            "canvas_x": 455.05,
+            "canvas_y": 322.72
+          },
+          "mrl": {
+            "value": 6.78,
+            "unit": "m AMSL"
+          },
+          "connected_pipe_id": null,
+          "connects_to_element_id": "0e1a44c1-a668-4f06-a1b9-97197215f34d",
+          "connects_to_port_index": 1,
+          "supply_mode": "direct_supply"
+        },
+        {
+          "index": 1,
+          "role": "downstream",
+          "label": "Output",
+          "position": {
+            "canvas_x": 449.05,
+            "canvas_y": 322.72
+          },
+          "mrl": {
+            "value": 6.78,
+            "unit": "m AMSL"
+          },
+          "connected_pipe_id": null,
+          "connects_to_element_id": "714e58d2-6989-458e-81b8-84aaadc46b33",
+          "connects_to_port_index": 0,
+          "supply_mode": "direct_supply"
+        }
+      ],
+      "connected_pipe_ids": []
+    },
+    {
+      "id": "186a816d-3cf2-46f5-8657-57d23396d20e",
+      "type": "symbol",
+      "symbol_id": "flexible_connection",
+      "symbol_name": "Flexible Connection",
+      "node_type": "component",
+      "position": {
+        "canvas_x": 462.05,
+        "canvas_y": 322.72
+      },
+      "width": 6,
+      "height": 6,
+      "elevation_m": 6.78,
+      "supply_mode": "direct_supply",
+      "rotation_deg": 0,
+      "scale_x": -1,
+      "ports": [
+        {
+          "index": 0,
+          "role": "upstream",
+          "label": "Input",
+          "position": {
+            "canvas_x": 465.05,
+            "canvas_y": 322.72
+          },
+          "mrl": {
+            "value": 6.78,
+            "unit": "m AMSL"
+          },
+          "connected_pipe_id": null,
+          "connects_to_element_id": "7a99b8a3-6938-4f08-a327-763783b2dbe9",
+          "connects_to_port_index": 1,
+          "supply_mode": "direct_supply"
+        },
+        {
+          "index": 1,
+          "role": "downstream",
+          "label": "Output",
+          "position": {
+            "canvas_x": 459.05,
+            "canvas_y": 322.72
+          },
+          "mrl": {
+            "value": 6.78,
+            "unit": "m AMSL"
+          },
+          "connected_pipe_id": null,
+          "connects_to_element_id": "0e1a44c1-a668-4f06-a1b9-97197215f34d",
+          "connects_to_port_index": 0,
+          "supply_mode": "direct_supply"
+        }
+      ],
+      "connected_pipe_ids": []
+    },
+    {
+      "id": "99cb54a3-74e7-4560-b21e-4cf6ca80432c",
+      "type": "symbol",
+      "symbol_id": "pump",
+      "symbol_name": "Pump",
+      "node_type": "pressure_booster",
+      "position": {
+        "canvas_x": 459.79,
+        "canvas_y": 314.29
+      },
+      "width": 10,
+      "height": 10,
+      "elevation_m": 6.99,
+      "supply_mode": "direct_supply",
+      "rotation_deg": 180,
+      "scale_x": 1,
+      "ports": [
+        {
+          "index": 0,
+          "role": "upstream",
+          "label": "Input",
+          "position": {
+            "canvas_x": 461.87,
+            "canvas_y": 314.29
+          },
+          "mrl": {
+            "value": 6.99,
+            "unit": "m AMSL"
+          },
+          "connected_pipe_id": null,
+          "connects_to_element_id": "f907ce2c-af07-4110-ab16-7918efb77753",
+          "connects_to_port_index": 1,
+          "supply_mode": "direct_supply"
+        },
+        {
+          "index": 1,
+          "role": "downstream",
+          "label": "Output",
+          "position": {
+            "canvas_x": 457.29,
+            "canvas_y": 314.29
+          },
+          "mrl": {
+            "value": 6.99,
+            "unit": "m AMSL"
+          },
+          "connected_pipe_id": null,
+          "connects_to_element_id": "ab85e63c-b357-4c9e-956e-bb851df91ee3",
+          "connects_to_port_index": 0,
+          "supply_mode": "direct_supply"
+        }
+      ],
+      "connected_pipe_ids": [],
+      "pump_rated_head_m": null
+    },
+    {
+      "id": "179cf9af-f72f-4d16-9cae-c81e22d67fcf",
+      "type": "symbol",
+      "symbol_id": "gate_valve",
+      "symbol_name": "Gate Valve",
+      "node_type": "isolation_valve",
+      "position": {
+        "canvas_x": 476.87,
+        "canvas_y": 314.29
+      },
+      "width": 6,
+      "height": 6,
+      "elevation_m": 6.99,
+      "supply_mode": "direct_supply",
+      "rotation_deg": 180,
+      "scale_x": 1,
+      "ports": [
+        {
+          "index": 0,
+          "role": "upstream",
+          "label": "Input",
+          "position": {
+            "canvas_x": 479.87,
+            "canvas_y": 314.29
+          },
+          "mrl": {
+            "value": 6.99,
+            "unit": "m AMSL"
+          },
+          "connected_pipe_id": null,
+          "connects_to_element_id": "618528ce-c815-4ce6-8761-6ea82bde750d",
+          "connects_to_port_index": 0,
+          "supply_mode": "direct_supply"
+        },
+        {
+          "index": 1,
+          "role": "downstream",
+          "label": "Output",
+          "position": {
+            "canvas_x": 473.87,
+            "canvas_y": 314.29
+          },
+          "mrl": {
+            "value": 6.99,
+            "unit": "m AMSL"
+          },
+          "connected_pipe_id": null,
+          "connects_to_element_id": "39af24b6-9fd1-46ca-9ccc-1f0d46c1b8a0",
+          "connects_to_port_index": 0,
+          "supply_mode": "direct_supply"
+        }
+      ],
+      "connected_pipe_ids": []
+    },
+    {
+      "id": "f301d79b-f74e-4f45-b15a-c155aa22bb92",
+      "type": "symbol",
+      "symbol_id": "gate_valve",
+      "symbol_name": "Gate Valve",
+      "node_type": "isolation_valve",
+      "position": {
+        "canvas_x": 448.29,
+        "canvas_y": 314.29
+      },
+      "width": 6,
+      "height": 6,
+      "elevation_m": 6.99,
+      "supply_mode": "direct_supply",
+      "rotation_deg": 180,
+      "scale_x": 1,
+      "ports": [
+        {
+          "index": 0,
+          "role": "upstream",
+          "label": "Input",
+          "position": {
+            "canvas_x": 451.29,
+            "canvas_y": 314.29
+          },
+          "mrl": {
+            "value": 6.99,
+            "unit": "m AMSL"
+          },
+          "connected_pipe_id": null,
+          "connects_to_element_id": "ab85e63c-b357-4c9e-956e-bb851df91ee3",
+          "connects_to_port_index": 1,
+          "supply_mode": "direct_supply"
+        },
+        {
+          "index": 1,
+          "role": "downstream",
+          "label": "Output",
+          "position": {
+            "canvas_x": 445.29,
+            "canvas_y": 314.29
+          },
+          "mrl": {
+            "value": 6.99,
+            "unit": "m AMSL"
+          },
+          "connected_pipe_id": null,
+          "connects_to_element_id": "89a947df-ad5c-47db-9b37-246140cc1b0b",
+          "connects_to_port_index": 1,
+          "supply_mode": "direct_supply"
+        }
+      ],
+      "connected_pipe_ids": []
+    },
+    {
+      "id": "ab85e63c-b357-4c9e-956e-bb851df91ee3",
+      "type": "symbol",
+      "symbol_id": "flexible_connection",
+      "symbol_name": "Flexible Connection",
+      "node_type": "component",
+      "position": {
+        "canvas_x": 454.29,
+        "canvas_y": 314.29
+      },
+      "width": 6,
+      "height": 6,
+      "elevation_m": 6.99,
+      "supply_mode": "direct_supply",
+      "rotation_deg": 180,
+      "scale_x": 1,
+      "ports": [
+        {
+          "index": 0,
+          "role": "upstream",
+          "label": "Input",
+          "position": {
+            "canvas_x": 457.29,
+            "canvas_y": 314.29
+          },
+          "mrl": {
+            "value": 6.99,
+            "unit": "m AMSL"
+          },
+          "connected_pipe_id": null,
+          "connects_to_element_id": "99cb54a3-74e7-4560-b21e-4cf6ca80432c",
+          "connects_to_port_index": 1,
+          "supply_mode": "direct_supply"
+        },
+        {
+          "index": 1,
+          "role": "downstream",
+          "label": "Output",
+          "position": {
+            "canvas_x": 451.29,
+            "canvas_y": 314.29
+          },
+          "mrl": {
+            "value": 6.99,
+            "unit": "m AMSL"
+          },
+          "connected_pipe_id": null,
+          "connects_to_element_id": "f301d79b-f74e-4f45-b15a-c155aa22bb92",
+          "connects_to_port_index": 0,
+          "supply_mode": "direct_supply"
+        }
+      ],
+      "connected_pipe_ids": []
+    },
+    {
+      "id": "f907ce2c-af07-4110-ab16-7918efb77753",
+      "type": "symbol",
+      "symbol_id": "flexible_connection",
+      "symbol_name": "Flexible Connection",
+      "node_type": "component",
+      "position": {
+        "canvas_x": 464.87,
+        "canvas_y": 314.29
+      },
+      "width": 6,
+      "height": 6,
+      "elevation_m": 6.99,
+      "supply_mode": "direct_supply",
+      "rotation_deg": 0,
+      "scale_x": -1,
+      "ports": [
+        {
+          "index": 0,
+          "role": "upstream",
+          "label": "Input",
+          "position": {
+            "canvas_x": 467.87,
+            "canvas_y": 314.29
+          },
+          "mrl": {
+            "value": 6.99,
+            "unit": "m AMSL"
+          },
+          "connected_pipe_id": null,
+          "connects_to_element_id": "39af24b6-9fd1-46ca-9ccc-1f0d46c1b8a0",
+          "connects_to_port_index": 1,
+          "supply_mode": "direct_supply"
+        },
+        {
+          "index": 1,
+          "role": "downstream",
+          "label": "Output",
+          "position": {
+            "canvas_x": 461.87,
+            "canvas_y": 314.29
+          },
+          "mrl": {
+            "value": 6.99,
+            "unit": "m AMSL"
+          },
+          "connected_pipe_id": null,
+          "connects_to_element_id": "99cb54a3-74e7-4560-b21e-4cf6ca80432c",
+          "connects_to_port_index": 0,
+          "supply_mode": "direct_supply"
+        }
+      ],
+      "connected_pipe_ids": []
+    },
+    {
+      "id": "eb5d1096-ba3a-4901-ad35-326acbaec4b8",
+      "type": "symbol",
+      "symbol_id": "check_valve",
+      "symbol_name": "Check Valve",
+      "node_type": "check_valve",
+      "position": {
+        "canvas_x": 458.31,
+        "canvas_y": 337.21
+      },
+      "width": 6,
+      "height": 6,
+      "elevation_m": 6.42,
+      "supply_mode": "direct_supply",
+      "rotation_deg": 180,
+      "scale_x": 1,
+      "ports": [
+        {
+          "index": 0,
+          "role": "upstream",
+          "label": "Input",
+          "position": {
+            "canvas_x": 461.31,
+            "canvas_y": 337.21
+          },
+          "mrl": {
+            "value": 6.42,
+            "unit": "m AMSL"
+          },
+          "connected_pipe_id": null,
+          "connects_to_element_id": "82006b1f-ddf2-4918-b2ab-2b27ac3414f5",
+          "connects_to_port_index": 1,
+          "supply_mode": "direct_supply"
+        },
+        {
+          "index": 1,
+          "role": "downstream",
+          "label": "Output",
+          "position": {
+            "canvas_x": 455.31,
+            "canvas_y": 337.21
+          },
+          "mrl": {
+            "value": 6.42,
+            "unit": "m AMSL"
+          },
+          "connected_pipe_id": "416c1b17-8ba9-4e8a-8acd-bf6add4d9106",
+          "connects_to_element_id": "8a10e0de-b29f-49ee-a633-3da1f23a3482",
+          "connects_to_port_index": 0,
+          "supply_mode": "direct_supply"
+        }
+      ],
+      "connected_pipe_ids": [
+        "416c1b17-8ba9-4e8a-8acd-bf6add4d9106"
+      ]
+    },
+    {
+      "id": "89a947df-ad5c-47db-9b37-246140cc1b0b",
+      "type": "symbol",
+      "symbol_id": "elbow_bend",
+      "symbol_name": "Elbow Bend",
+      "node_type": "bend",
+      "position": {
+        "canvas_x": 442.54,
+        "canvas_y": 317.04
+      },
+      "width": 6,
+      "height": 6,
+      "elevation_m": 6.92,
+      "supply_mode": "direct_supply",
+      "rotation_deg": 270,
+      "scale_x": 1,
+      "ports": [
+        {
+          "index": 0,
+          "role": "downstream",
+          "label": "out",
+          "position": {
+            "canvas_x": 439.79,
+            "canvas_y": 319.79
+          },
+          "mrl": {
+            "value": 6.86,
+            "unit": "m AMSL"
+          },
+          "connected_pipe_id": null,
+          "connects_to_element_id": "13967ce6-0d25-475b-8ba2-502d9a305735",
+          "connects_to_port_index": 1,
+          "supply_mode": "direct_supply"
+        },
+        {
+          "index": 1,
+          "role": "upstream",
+          "label": "in",
+          "position": {
+            "canvas_x": 445.29,
+            "canvas_y": 314.29
+          },
+          "mrl": {
+            "value": 6.99,
+            "unit": "m AMSL"
+          },
+          "connected_pipe_id": null,
+          "connects_to_element_id": "f301d79b-f74e-4f45-b15a-c155aa22bb92",
+          "connects_to_port_index": 1,
+          "supply_mode": "direct_supply"
+        }
+      ],
+      "connected_pipe_ids": [],
+      "upstream_port_index": 1,
+      "pipe_type": "cold"
+    },
+    {
+      "id": "45c2e02f-d37c-4dae-92f0-352271104b26",
+      "type": "symbol",
+      "symbol_id": "tee_junction",
+      "symbol_name": "Tee Junction",
+      "node_type": "junction",
+      "position": {
+        "canvas_x": 439.79,
+        "canvas_y": 328.71
+      },
+      "width": 6,
+      "height": 6,
+      "elevation_m": 6.63,
+      "supply_mode": "direct_supply",
+      "rotation_deg": 90,
+      "scale_x": 1,
+      "ports": [
+        {
+          "index": 0,
+          "role": "upstream",
+          "label": "in",
+          "position": {
+            "canvas_x": 439.79,
+            "canvas_y": 325.71
+          },
+          "mrl": {
+            "value": 6.71,
+            "unit": "m AMSL"
+          },
+          "connected_pipe_id": null,
+          "connects_to_element_id": "13967ce6-0d25-475b-8ba2-502d9a305735",
+          "connects_to_port_index": 0,
+          "supply_mode": "direct_supply"
+        },
+        {
+          "index": 1,
+          "role": "upstream",
+          "label": "in",
+          "position": {
+            "canvas_x": 439.79,
+            "canvas_y": 331.71
+          },
+          "mrl": {
+            "value": 6.56,
+            "unit": "m AMSL"
+          },
+          "connected_pipe_id": null,
+          "connects_to_element_id": "8a10e0de-b29f-49ee-a633-3da1f23a3482",
+          "connects_to_port_index": 1,
+          "supply_mode": "direct_supply"
+        },
+        {
+          "index": 2,
+          "role": "downstream",
+          "label": "out",
+          "position": {
+            "canvas_x": 436.79,
+            "canvas_y": 328.71
+          },
+          "mrl": {
+            "value": 6.63,
+            "unit": "m AMSL"
+          },
+          "connected_pipe_id": null,
+          "connects_to_element_id": "504cf0c1-8237-4cd5-a19e-1e90ddf07045",
+          "connects_to_port_index": 0,
+          "supply_mode": "direct_supply"
+        }
+      ],
+      "connected_pipe_ids": [],
+      "upstream_port_indices": [
+        0,
+        1
+      ],
+      "pipe_type": "cold"
+    },
+    {
+      "id": "a805551b-3ad4-4a54-bf25-941508a2aa69",
+      "type": "symbol",
+      "symbol_id": "elbow_bend",
+      "symbol_name": "Elbow Bend",
+      "node_type": "bend",
+      "position": {
+        "canvas_x": 482.7,
+        "canvas_y": 334.54
+      },
+      "width": 6,
+      "height": 6,
+      "elevation_m": 6.49,
+      "supply_mode": "direct_supply",
+      "rotation_deg": 90,
+      "scale_x": 1,
+      "ports": [
+        {
+          "index": 0,
+          "role": "upstream",
+          "label": "in",
+          "position": {
+            "canvas_x": 485.45,
+            "canvas_y": 331.79
+          },
+          "mrl": {
+            "value": 6.56,
+            "unit": "m AMSL"
+          },
+          "connected_pipe_id": null,
+          "connects_to_element_id": "566fc1cd-75d2-437c-8e67-e9bed54baa56",
+          "connects_to_port_index": 0,
+          "supply_mode": "direct_supply"
+        },
+        {
+          "index": 1,
+          "role": "downstream",
+          "label": "out",
+          "position": {
+            "canvas_x": 479.95,
+            "canvas_y": 337.29
+          },
+          "mrl": {
+            "value": 6.42,
+            "unit": "m AMSL"
+          },
+          "connected_pipe_id": "3e2f95ad-b8a7-4b8a-ac9f-b215346b99c1",
+          "connects_to_element_id": "82006b1f-ddf2-4918-b2ab-2b27ac3414f5",
+          "connects_to_port_index": 0,
+          "supply_mode": "direct_supply"
+        }
+      ],
+      "connected_pipe_ids": [
+        "3e2f95ad-b8a7-4b8a-ac9f-b215346b99c1"
+      ],
+      "upstream_port_index": 0,
+      "pipe_type": "cold"
+    },
+    {
+      "id": "8a10e0de-b29f-49ee-a633-3da1f23a3482",
+      "type": "symbol",
+      "symbol_id": "elbow_bend",
+      "symbol_name": "Elbow Bend",
+      "node_type": "bend",
+      "position": {
+        "canvas_x": 442.41,
+        "canvas_y": 334.33
+      },
+      "width": 6,
+      "height": 6,
+      "elevation_m": 6.49,
+      "supply_mode": "direct_supply",
+      "rotation_deg": 180,
+      "scale_x": 1,
+      "ports": [
+        {
+          "index": 0,
+          "role": "upstream",
+          "label": "in",
+          "position": {
+            "canvas_x": 445.16,
+            "canvas_y": 337.08
+          },
+          "mrl": {
+            "value": 6.42,
+            "unit": "m AMSL"
+          },
+          "connected_pipe_id": "416c1b17-8ba9-4e8a-8acd-bf6add4d9106",
+          "connects_to_element_id": "eb5d1096-ba3a-4901-ad35-326acbaec4b8",
+          "connects_to_port_index": 1,
+          "supply_mode": "direct_supply"
+        },
+        {
+          "index": 1,
+          "role": "downstream",
+          "label": "out",
+          "position": {
+            "canvas_x": 439.66,
+            "canvas_y": 331.58
+          },
+          "mrl": {
+            "value": 6.56,
+            "unit": "m AMSL"
+          },
+          "connected_pipe_id": null,
+          "connects_to_element_id": "45c2e02f-d37c-4dae-92f0-352271104b26",
+          "connects_to_port_index": 1,
+          "supply_mode": "direct_supply"
+        }
+      ],
+      "connected_pipe_ids": [
+        "416c1b17-8ba9-4e8a-8acd-bf6add4d9106"
+      ],
+      "upstream_port_index": 0,
+      "pipe_type": "cold"
+    },
+    {
+      "id": "566fc1cd-75d2-437c-8e67-e9bed54baa56",
+      "type": "symbol",
+      "symbol_id": "tee_junction",
+      "symbol_name": "Tee Junction",
+      "node_type": "junction",
+      "position": {
+        "canvas_x": 485.45,
+        "canvas_y": 328.79
+      },
+      "width": 6,
+      "height": 6,
+      "elevation_m": 6.63,
+      "supply_mode": "direct_supply",
+      "rotation_deg": 270,
+      "scale_x": 1,
+      "ports": [
+        {
+          "index": 0,
+          "role": "downstream",
+          "label": "out",
+          "position": {
+            "canvas_x": 485.45,
+            "canvas_y": 331.79
+          },
+          "mrl": {
+            "value": 6.56,
+            "unit": "m AMSL"
+          },
+          "connected_pipe_id": null,
+          "connects_to_element_id": "a805551b-3ad4-4a54-bf25-941508a2aa69",
+          "connects_to_port_index": 0,
+          "supply_mode": "direct_supply"
+        },
+        {
+          "index": 1,
+          "role": "downstream",
+          "label": "out",
+          "position": {
+            "canvas_x": 485.45,
+            "canvas_y": 325.79
+          },
+          "mrl": {
+            "value": 6.71,
+            "unit": "m AMSL"
+          },
+          "connected_pipe_id": null,
+          "connects_to_element_id": "74d382c7-3467-4d51-8d60-0a7d3c7d5e41",
+          "connects_to_port_index": 1,
+          "supply_mode": "direct_supply"
+        },
+        {
+          "index": 2,
+          "role": "upstream",
+          "label": "in",
+          "position": {
+            "canvas_x": 488.45,
+            "canvas_y": 328.79
+          },
+          "mrl": {
+            "value": 6.63,
+            "unit": "m AMSL"
+          },
+          "connected_pipe_id": null,
+          "connects_to_element_id": null,
+          "connects_to_port_index": null,
+          "supply_mode": "direct_supply"
+        }
+      ],
+      "connected_pipe_ids": [],
+      "upstream_port_index": 2,
+      "pipe_type": null
+    },
+    {
+      "id": "504cf0c1-8237-4cd5-a19e-1e90ddf07045",
+      "type": "symbol",
+      "symbol_id": "tee_junction",
+      "symbol_name": "Tee Junction",
+      "node_type": "junction",
+      "position": {
+        "canvas_x": 433.79,
+        "canvas_y": 328.71
+      },
+      "width": 6,
+      "height": 6,
+      "elevation_m": 6.63,
+      "supply_mode": "direct_supply",
+      "rotation_deg": 180,
+      "scale_x": 1,
+      "ports": [
+        {
+          "index": 0,
+          "role": "upstream",
+          "label": "in",
+          "position": {
+            "canvas_x": 436.79,
+            "canvas_y": 328.71
+          },
+          "mrl": {
+            "value": 6.63,
+            "unit": "m AMSL"
+          },
+          "connected_pipe_id": null,
+          "connects_to_element_id": "45c2e02f-d37c-4dae-92f0-352271104b26",
+          "connects_to_port_index": 2,
+          "supply_mode": "direct_supply"
+        },
+        {
+          "index": 1,
+          "role": "downstream",
+          "label": "out",
+          "position": {
+            "canvas_x": 430.79,
+            "canvas_y": 328.71
+          },
+          "mrl": {
+            "value": 6.63,
+            "unit": "m AMSL"
+          },
+          "connected_pipe_id": null,
+          "connects_to_element_id": null,
+          "connects_to_port_index": null,
+          "supply_mode": "direct_supply"
+        },
+        {
+          "index": 2,
+          "role": "downstream",
+          "label": "out",
+          "position": {
+            "canvas_x": 433.79,
+            "canvas_y": 325.71
+          },
+          "mrl": {
+            "value": 6.71,
+            "unit": "m AMSL"
+          },
+          "connected_pipe_id": null,
+          "connects_to_element_id": "6a3b736d-a934-4eeb-8c95-d67494c31f70",
+          "connects_to_port_index": 0,
+          "supply_mode": "direct_supply"
+        }
+      ],
+      "connected_pipe_ids": [],
+      "upstream_port_index": 0,
+      "pipe_type": "cold"
+    },
+    {
+      "id": "6a3b736d-a934-4eeb-8c95-d67494c31f70",
+      "type": "symbol",
+      "symbol_id": "gate_valve",
+      "symbol_name": "Gate Valve",
+      "node_type": "isolation_valve",
+      "position": {
+        "canvas_x": 433.79,
+        "canvas_y": 322.71
+      },
+      "width": 6,
+      "height": 6,
+      "elevation_m": 6.78,
+      "supply_mode": "direct_supply",
+      "rotation_deg": 270,
+      "scale_x": 1,
+      "ports": [
+        {
+          "index": 0,
+          "role": "upstream",
+          "label": "Input",
+          "position": {
+            "canvas_x": 433.79,
+            "canvas_y": 325.71
+          },
+          "mrl": {
+            "value": 6.71,
+            "unit": "m AMSL"
+          },
+          "connected_pipe_id": null,
+          "connects_to_element_id": "504cf0c1-8237-4cd5-a19e-1e90ddf07045",
+          "connects_to_port_index": 2,
+          "supply_mode": "direct_supply"
+        },
+        {
+          "index": 1,
+          "role": "downstream",
+          "label": "Output",
+          "position": {
+            "canvas_x": 433.79,
+            "canvas_y": 319.71
+          },
+          "mrl": {
+            "value": 6.86,
+            "unit": "m AMSL"
+          },
+          "connected_pipe_id": null,
+          "connects_to_element_id": "26f511c5-9808-4fbc-8054-4396e7d3bca3",
+          "connects_to_port_index": 0,
+          "supply_mode": "direct_supply"
+        }
+      ],
+      "connected_pipe_ids": []
+    },
+    {
+      "id": "26f511c5-9808-4fbc-8054-4396e7d3bca3",
+      "type": "symbol",
+      "symbol_id": "pressure_vessel_schematic",
+      "symbol_name": "Pressure Vessel (Schematic)",
+      "node_type": "component",
+      "position": {
+        "canvas_x": 433.79,
+        "canvas_y": 316.71
+      },
+      "width": 6,
+      "height": 6,
+      "elevation_m": 6.93,
+      "supply_mode": "direct_supply",
+      "rotation_deg": 0,
+      "scale_x": 1,
+      "ports": [
+        {
+          "index": 0,
+          "role": "upstream",
+          "label": null,
+          "position": {
+            "canvas_x": 433.79,
+            "canvas_y": 319.71
+          },
+          "mrl": {
+            "value": 6.86,
+            "unit": "m AMSL"
+          },
+          "connected_pipe_id": null,
+          "connects_to_element_id": "6a3b736d-a934-4eeb-8c95-d67494c31f70",
+          "connects_to_port_index": 1,
+          "supply_mode": "direct_supply"
+        }
+      ],
+      "connected_pipe_ids": []
+    },
+    {
+      "id": "618528ce-c815-4ce6-8761-6ea82bde750d",
+      "type": "symbol",
+      "symbol_id": "elbow_bend",
+      "symbol_name": "Elbow Bend",
+      "node_type": "bend",
+      "position": {
+        "canvas_x": 482.7,
+        "canvas_y": 317.04
+      },
+      "width": 6,
+      "height": 6,
+      "elevation_m": 6.92,
+      "supply_mode": "direct_supply",
+      "rotation_deg": 0,
+      "scale_x": 1,
+      "ports": [
+        {
+          "index": 0,
+          "role": "downstream",
+          "label": "out",
+          "position": {
+            "canvas_x": 479.95,
+            "canvas_y": 314.29
+          },
+          "mrl": {
+            "value": 6.99,
+            "unit": "m AMSL"
+          },
+          "connected_pipe_id": null,
+          "connects_to_element_id": "179cf9af-f72f-4d16-9cae-c81e22d67fcf",
+          "connects_to_port_index": 0,
+          "supply_mode": "direct_supply"
+        },
+        {
+          "index": 1,
+          "role": "upstream",
+          "label": "in",
+          "position": {
+            "canvas_x": 485.45,
+            "canvas_y": 319.79
+          },
+          "mrl": {
+            "value": 6.86,
+            "unit": "m AMSL"
+          },
+          "connected_pipe_id": null,
+          "connects_to_element_id": "74d382c7-3467-4d51-8d60-0a7d3c7d5e41",
+          "connects_to_port_index": 0,
+          "supply_mode": "direct_supply"
+        }
+      ],
+      "connected_pipe_ids": [],
+      "upstream_port_index": 1,
+      "pipe_type": "cold"
+    },
+    {
+      "id": "13967ce6-0d25-475b-8ba2-502d9a305735",
+      "type": "symbol",
+      "symbol_id": "tee_junction",
+      "symbol_name": "Tee Junction",
+      "node_type": "junction",
+      "position": {
+        "canvas_x": 439.79,
+        "canvas_y": 322.79
+      },
+      "width": 6,
+      "height": 6,
+      "elevation_m": 6.78,
+      "supply_mode": "direct_supply",
+      "rotation_deg": 270,
+      "scale_x": 1,
+      "ports": [
+        {
+          "index": 0,
+          "role": "downstream",
+          "label": "out",
+          "position": {
+            "canvas_x": 439.79,
+            "canvas_y": 325.79
+          },
+          "mrl": {
+            "value": 6.71,
+            "unit": "m AMSL"
+          },
+          "connected_pipe_id": null,
+          "connects_to_element_id": "45c2e02f-d37c-4dae-92f0-352271104b26",
+          "connects_to_port_index": 0,
+          "supply_mode": "direct_supply"
+        },
+        {
+          "index": 1,
+          "role": "upstream",
+          "label": "in",
+          "position": {
+            "canvas_x": 439.79,
+            "canvas_y": 319.79
+          },
+          "mrl": {
+            "value": 6.86,
+            "unit": "m AMSL"
+          },
+          "connected_pipe_id": null,
+          "connects_to_element_id": "89a947df-ad5c-47db-9b37-246140cc1b0b",
+          "connects_to_port_index": 0,
+          "supply_mode": "direct_supply"
+        },
+        {
+          "index": 2,
+          "role": "upstream",
+          "label": "in",
+          "position": {
+            "canvas_x": 442.79,
+            "canvas_y": 322.79
+          },
+          "mrl": {
+            "value": 6.78,
+            "unit": "m AMSL"
+          },
+          "connected_pipe_id": null,
+          "connects_to_element_id": "714e58d2-6989-458e-81b8-84aaadc46b33",
+          "connects_to_port_index": 1,
+          "supply_mode": "direct_supply"
+        }
+      ],
+      "connected_pipe_ids": [],
+      "upstream_port_indices": [
+        1,
+        2
+      ],
+      "pipe_type": "cold"
+    },
+    {
+      "id": "39af24b6-9fd1-46ca-9ccc-1f0d46c1b8a0",
+      "type": "symbol",
+      "symbol_id": "y_type_strainer",
+      "symbol_name": "Y-Type Strainer",
+      "node_type": "component",
+      "position": {
+        "canvas_x": 470.87,
+        "canvas_y": 314.29
+      },
+      "width": 6,
+      "height": 6,
+      "elevation_m": 6.99,
+      "supply_mode": "direct_supply",
+      "rotation_deg": 0,
+      "scale_x": 1,
+      "ports": [
+        {
+          "index": 0,
+          "role": "upstream",
+          "label": "Input",
+          "position": {
+            "canvas_x": 473.87,
+            "canvas_y": 314.29
+          },
+          "mrl": {
+            "value": 6.99,
+            "unit": "m AMSL"
+          },
+          "connected_pipe_id": null,
+          "connects_to_element_id": "179cf9af-f72f-4d16-9cae-c81e22d67fcf",
+          "connects_to_port_index": 1,
+          "supply_mode": "direct_supply"
+        },
+        {
+          "index": 1,
+          "role": "downstream",
+          "label": "Output",
+          "position": {
+            "canvas_x": 467.87,
+            "canvas_y": 314.29
+          },
+          "mrl": {
+            "value": 6.99,
+            "unit": "m AMSL"
+          },
+          "connected_pipe_id": null,
+          "connects_to_element_id": "f907ce2c-af07-4110-ab16-7918efb77753",
+          "connects_to_port_index": 0,
+          "supply_mode": "direct_supply"
+        }
+      ],
+      "connected_pipe_ids": []
+    },
+    {
+      "id": "7a99b8a3-6938-4f08-a327-763783b2dbe9",
+      "type": "symbol",
+      "symbol_id": "y_type_strainer",
+      "symbol_name": "Y-Type Strainer",
+      "node_type": "component",
+      "position": {
+        "canvas_x": 468.05,
+        "canvas_y": 322.72
+      },
+      "width": 6,
+      "height": 6,
+      "elevation_m": 6.78,
+      "supply_mode": "direct_supply",
+      "rotation_deg": 0,
+      "scale_x": 1,
+      "ports": [
+        {
+          "index": 0,
+          "role": "upstream",
+          "label": "Input",
+          "position": {
+            "canvas_x": 471.05,
+            "canvas_y": 322.72
+          },
+          "mrl": {
+            "value": 6.78,
+            "unit": "m AMSL"
+          },
+          "connected_pipe_id": null,
+          "connects_to_element_id": "8bf18f82-3efb-4421-b143-61127c2cbdc5",
+          "connects_to_port_index": 1,
+          "supply_mode": "direct_supply"
+        },
+        {
+          "index": 1,
+          "role": "downstream",
+          "label": "Output",
+          "position": {
+            "canvas_x": 465.05,
+            "canvas_y": 322.72
+          },
+          "mrl": {
+            "value": 6.78,
+            "unit": "m AMSL"
+          },
+          "connected_pipe_id": null,
+          "connects_to_element_id": "186a816d-3cf2-46f5-8657-57d23396d20e",
+          "connects_to_port_index": 0,
+          "supply_mode": "direct_supply"
+        }
+      ],
+      "connected_pipe_ids": []
+    }
+  ],
+  "pipes": [
+    {
+      "id": "416c1b17-8ba9-4e8a-8acd-bf6add4d9106",
+      "type": "water_pipe",
+      "pipe_type": "cold",
+      "start": {
+        "canvas_x": 455.31,
+        "canvas_y": 337.21,
+        "mrl": 6.42
+      },
+      "end": {
+        "canvas_x": 445.24,
+        "canvas_y": 337.21,
+        "mrl": 6.42
+      },
+      "supply_mode": "direct_supply",
+      "start_connects_to": "eb5d1096-ba3a-4901-ad35-326acbaec4b8",
+      "start_port_index": 1,
+      "start_port_role": "downstream",
+      "end_connects_to": "8a10e0de-b29f-49ee-a633-3da1f23a3482",
+      "end_port_index": 0,
+      "end_port_role": "upstream",
+      "flow_from_element_id": "eb5d1096-ba3a-4901-ad35-326acbaec4b8",
+      "flow_from_port_index": 1,
+      "flow_to_element_id": "8a10e0de-b29f-49ee-a633-3da1f23a3482",
+      "flow_to_port_index": 0,
+      "length_px": 10.07,
+      "rotation_deg": 180
+    },
+    {
+      "id": "3ebeb963-a38d-4071-a46c-ec436c37387f",
+      "type": "water_pipe",
+      "pipe_type": "cold",
+      "start": {
+        "canvas_x": 482.45,
+        "canvas_y": 322.79,
+        "mrl": 6.78
+      },
+      "end": {
+        "canvas_x": 477.05,
+        "canvas_y": 322.72,
+        "mrl": 6.78
+      },
+      "supply_mode": "direct_supply",
+      "start_connects_to": "74d382c7-3467-4d51-8d60-0a7d3c7d5e41",
+      "start_port_index": 2,
+      "start_port_role": "downstream",
+      "end_connects_to": "8bf18f82-3efb-4421-b143-61127c2cbdc5",
+      "end_port_index": 0,
+      "end_port_role": "upstream",
+      "flow_from_element_id": "74d382c7-3467-4d51-8d60-0a7d3c7d5e41",
+      "flow_from_port_index": 2,
+      "flow_to_element_id": "8bf18f82-3efb-4421-b143-61127c2cbdc5",
+      "flow_to_port_index": 0,
+      "length_px": 5.4,
+      "rotation_deg": -179.26
+    },
+    {
+      "id": "3e2f95ad-b8a7-4b8a-ac9f-b215346b99c1",
+      "type": "water_pipe",
+      "pipe_type": "cold",
+      "start": {
+        "canvas_x": 479.95,
+        "canvas_y": 337.29,
+        "mrl": 6.42
+      },
+      "end": {
+        "canvas_x": 467.31,
+        "canvas_y": 337.21,
+        "mrl": 6.42
+      },
+      "supply_mode": "direct_supply",
+      "start_connects_to": "a805551b-3ad4-4a54-bf25-941508a2aa69",
+      "start_port_index": 1,
+      "start_port_role": "downstream",
+      "end_connects_to": "82006b1f-ddf2-4918-b2ab-2b27ac3414f5",
+      "end_port_index": 0,
+      "end_port_role": "upstream",
+      "flow_from_element_id": "a805551b-3ad4-4a54-bf25-941508a2aa69",
+      "flow_from_port_index": 1,
+      "flow_to_element_id": "82006b1f-ddf2-4918-b2ab-2b27ac3414f5",
+      "flow_to_port_index": 0,
+      "length_px": 12.64,
+      "rotation_deg": -179.64
+    }
+  ],
+  "annotations": [
+    {
+      "id": "d5c4573b-4e27-4c94-af70-a2aa0cd09a3d",
+      "type": "annotation",
+      "text": "Normally closed",
+      "position": {
+        "canvas_x": 450.79,
+        "canvas_y": 344.48
+      },
+      "mrl": {
+        "value": 6.24,
+        "unit": "m AMSL"
+      },
+      "font_size": 2,
+      "color": "#1a1a1a",
+      "max_width": 22,
+      "height": 2.7
+    }
+  ],
+  "hydraulic_context": {
+    "flow_mode": "pump_assisted",
+    "source_element_id": null,
+    "source_mrl_m": null,
+    "pump_element_ids": [
+      "0e1a44c1-a668-4f06-a1b9-97197215f34d",
+      "99cb54a3-74e7-4560-b21e-4cf6ca80432c"
+    ],
+    "lowest_outlet_mrl_m": null,
+    "gravity_head_available_m": null,
+    "gravity_head_sufficient": true,
+    "note": "Pump-assisted system (2 pump(s) detected). Pump provides pressure regardless of gravity head."
+  },
+  "summary": {
+    "total_elements": 25,
+    "total_pipes": 3,
+    "total_pipe_length_px": 28.11
+  }
+}

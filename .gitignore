@@ -44,7 +44,7 @@ Thumbs.db
 PROGRESS.md
 
 # Root-level schematic exports (samples live in docs/examples/)
-schematic_*.json
+/schematic_*.json
 schematic_*.jpg
 
 # TypeScript build info
