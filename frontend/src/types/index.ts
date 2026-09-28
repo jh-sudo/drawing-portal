@@ -61,13 +61,17 @@ export function getPxPerMetre(drawingScale: DrawingScale): number {
   return (SHEET_PX_PER_MM * 1000) / drawingScale;
 }
 
+export type SubmissionType = 'PE' | 'LP';
+
 export interface TitleBlockData {
+  /** Who is submitting the drawing — decides which fields are mandatory (see getMissingTitleBlockFields). */
+  submissionType?: SubmissionType;
   // Free-form block sections (textarea — line breaks preserved)
   ownerDeveloper?:       string;
-  structuralEngineer?:   string;
+  professionalEngineer?: string;
   projectName:           string;
   mainContractor?:       string;
-  plumbingContractor?:   string;
+  licensedPlumber?:      string;
   // Short structured fields (bottom table)
   drawingNo:    string;
   drawnBy:      string;
@@ -78,14 +82,14 @@ export interface TitleBlockData {
   tenureOfLand?: string;
   /** Base64 data-URL of the owner/developer signature image */
   ownerStamp?: string;
-  /** Base64 data-URL of the structural engineer stamp/signature image */
-  structuralEngineerStamp?: string;
-  /** Base64 data-URL of the LP/PE stamp placed freely on the canvas */
-  lpPeStamp?: string;
-  /** Canvas-space position and size of the LP/PE stamp overlay */
-  lpPeStampX?: number;
-  lpPeStampY?: number;
-  lpPeStampSize?: number;
+  /** Base64 data-URL of the professional engineer stamp/signature image */
+  peStamp?: string;
+  /** Base64 data-URL of the licensed plumber stamp/signature placed freely on the canvas */
+  lpStamp?: string;
+  /** Canvas-space position and size of the LP stamp overlay */
+  lpStampX?: number;
+  lpStampY?: number;
+  lpStampSize?: number;
 }
 
 export interface SheetConfig {
@@ -99,10 +103,10 @@ export const DEFAULT_SHEET_CONFIG: SheetConfig = {
   drawingScale: 50,
   titleBlock: {
     ownerDeveloper:       '',
-    structuralEngineer:   '',
+    professionalEngineer: '',
     projectName:          '',
     mainContractor:       '',
-    plumbingContractor:   '',
+    licensedPlumber:      '',
     drawingNo:            '',
     drawnBy:              '',
     checkedBy:            '',

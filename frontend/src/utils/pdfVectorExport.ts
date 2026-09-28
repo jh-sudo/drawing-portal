@@ -264,12 +264,12 @@ async function drawTitleBlock(
     return result.sort((a, b) => a.symbolName.localeCompare(b.symbolName));
   })();
 
-  const layout = computeTitleBlockLayout(sheetConfig, uniqueSymbols.length, !!titleBlock.ownerStamp, !!titleBlock.structuralEngineerStamp);
+  const layout = computeTitleBlockLayout(sheetConfig, uniqueSymbols.length, !!titleBlock.ownerStamp, !!titleBlock.peStamp);
   const {
     paperH, tbW, tbX, headerH,
-    ownerStampExtraH, structuralStampExtraH,
-    ownerH, structuralH, projH, mainH, plumbH,
-    yOwner, yStructural, yProj, yMain, yPlumb,
+    ownerStampExtraH, peStampExtraH,
+    ownerH, peH, projH, mainH, plumberH,
+    yOwner, yPe, yProj, yMain, yPlumber,
     legendCols, legendH, yLegend,
     btRowH, dtRowH, yDt, yRow1, yRow2, yRow3,
     c1W, c2W, c3W, borderWidth,
@@ -321,19 +321,19 @@ async function drawTitleBlock(
   if (titleBlock.ownerStamp) await drawStamp(pdf, titleBlock.ownerStamp, ownerStampExtraH, yOwner, ownerH, tbX, tbW);
   label(tbX + PAD, yOwner + ownerH - 13, 'SIGN :');
 
-  // Structural Engineer
-  box(tbX, yStructural, tbW, structuralH);
-  blockText(tbX, yStructural, 'STRUCTURAL ENGINEER :', titleBlock.structuralEngineer);
-  if (titleBlock.structuralEngineerStamp) await drawStamp(pdf, titleBlock.structuralEngineerStamp, structuralStampExtraH, yStructural, structuralH, tbX, tbW);
-  label(tbX + PAD, yStructural + structuralH - 13, 'SIGN :');
+  // Professional Engineer
+  box(tbX, yPe, tbW, peH);
+  blockText(tbX, yPe, 'PROFESSIONAL ENGINEER :', titleBlock.professionalEngineer);
+  if (titleBlock.peStamp) await drawStamp(pdf, titleBlock.peStamp, peStampExtraH, yPe, peH, tbX, tbW);
+  label(tbX + PAD, yPe + peH - 13, 'SIGN :');
 
-  // Project Title / Main Con / Plumbing Contractor
+  // Project Title / Main Con / Licensed Plumber
   box(tbX, yProj, tbW, projH);
   blockText(tbX, yProj, 'PROJECT TITLE', titleBlock.projectName);
   box(tbX, yMain, tbW, mainH);
   blockText(tbX, yMain, 'MAIN CON :', titleBlock.mainContractor);
-  box(tbX, yPlumb, tbW, plumbH);
-  blockText(tbX, yPlumb, 'PLUMBING CONTRACTOR', titleBlock.plumbingContractor);
+  box(tbX, yPlumber, tbW, plumberH);
+  blockText(tbX, yPlumber, 'LICENSED PLUMBER', titleBlock.licensedPlumber);
 
   // Legend
   if (legendH > 0) {
@@ -590,12 +590,12 @@ export async function exportSchematicToPdf(virtualWidth: number, virtualHeight: 
   // Same bottom-to-top z-order as the Konva Stage in DrawingCanvas.tsx.
   drawGrid(pdf, virtualWidth, virtualHeight, mrlConfig.upperMrl, mrlConfig.lowerMrl, floorLevels, floorLevelOpacity);
   await drawTitleBlock(pdf, sheetConfig, elements, svgCache);
-  if (sheetConfig.titleBlock.lpPeStamp) {
-    const size = sheetConfig.titleBlock.lpPeStampSize ?? 100;
+  if (sheetConfig.titleBlock.lpStamp) {
+    const size = sheetConfig.titleBlock.lpStampSize ?? 100;
     const paperH = PAPER_SIZES_MM[sheetConfig.paperSize].h * SHEET_PX_PER_MM;
-    const lx = sheetConfig.titleBlock.lpPeStampX ?? AXIS_WIDTH + 20;
-    const ly = sheetConfig.titleBlock.lpPeStampY ?? paperH - size - 20;
-    pdf.addImage(sheetConfig.titleBlock.lpPeStamp, dataUrlFormat(sheetConfig.titleBlock.lpPeStamp), mm(lx), mm(ly), mm(size), mm(size));
+    const lx = sheetConfig.titleBlock.lpStampX ?? AXIS_WIDTH + 20;
+    const ly = sheetConfig.titleBlock.lpStampY ?? paperH - size - 20;
+    pdf.addImage(sheetConfig.titleBlock.lpStamp, dataUrlFormat(sheetConfig.titleBlock.lpStamp), mm(lx), mm(ly), mm(size), mm(size));
   }
   drawPipes(pdf, pipes);
   await drawSymbols(pdf, elements, pipes, svgCache);

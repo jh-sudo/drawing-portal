@@ -11,7 +11,7 @@ interface Props {
 
 const DEFAULT_SIZE = 100; // canvas px
 
-export function LpPeStampLayer({ sheetConfig }: Props) {
+export function LpStampLayer({ sheetConfig }: Props) {
   const { titleBlock, paperSize } = sheetConfig;
   const setSheetConfig = useUiStore((s) => s.setSheetConfig);
 
@@ -21,11 +21,11 @@ export function LpPeStampLayer({ sheetConfig }: Props) {
   const trRef      = useRef<Konva.Transformer>(null);
 
   useEffect(() => {
-    if (!titleBlock.lpPeStamp) { setImg(null); return; }
+    if (!titleBlock.lpStamp) { setImg(null); return; }
     const i = new window.Image();
     i.onload = () => setImg(i);
-    i.src = titleBlock.lpPeStamp;
-  }, [titleBlock.lpPeStamp]);
+    i.src = titleBlock.lpStamp;
+  }, [titleBlock.lpStamp]);
 
   // Attach transformer when selected
   useEffect(() => {
@@ -46,11 +46,11 @@ export function LpPeStampLayer({ sheetConfig }: Props) {
   if (!img) return null;
 
   const paperH = PAPER_SIZES_MM[paperSize].h * SHEET_PX_PER_MM;
-  const size   = titleBlock.lpPeStampSize ?? DEFAULT_SIZE;
+  const size   = titleBlock.lpStampSize ?? DEFAULT_SIZE;
 
   // Default position: bottom-left of paper area, above the bottom margin
-  const x = titleBlock.lpPeStampX ?? AXIS_WIDTH + 20;
-  const y = titleBlock.lpPeStampY ?? paperH - size - 20;
+  const x = titleBlock.lpStampX ?? AXIS_WIDTH + 20;
+  const y = titleBlock.lpStampY ?? paperH - size - 20;
 
   const saveTransform = () => {
     const node = imageRef.current;
@@ -62,9 +62,9 @@ export function LpPeStampLayer({ sheetConfig }: Props) {
       ...sheetConfig,
       titleBlock: {
         ...titleBlock,
-        lpPeStampX:    Math.round(node.x()),
-        lpPeStampY:    Math.round(node.y()),
-        lpPeStampSize: newSize,
+        lpStampX:    Math.round(node.x()),
+        lpStampY:    Math.round(node.y()),
+        lpStampSize: newSize,
       },
     });
   };

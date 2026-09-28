@@ -29,17 +29,17 @@ export interface TitleBlockLayout {
   tbX: number;
   headerH: number;
   ownerStampExtraH: number;
-  structuralStampExtraH: number;
+  peStampExtraH: number;
   ownerH: number;
-  structuralH: number;
+  peH: number;
   projH: number;
   mainH: number;
-  plumbH: number;
+  plumberH: number;
   yOwner: number;
-  yStructural: number;
+  yPe: number;
   yProj: number;
   yMain: number;
-  yPlumb: number;
+  yPlumber: number;
   legendCols: number;
   legendRows: number;
   legendH: number;
@@ -66,7 +66,7 @@ export function computeTitleBlockLayout(
   sheetConfig: SheetConfig,
   legendSymbolCount: number,
   hasOwnerStamp: boolean,
-  hasStructuralStamp: boolean,
+  hasPeStamp: boolean,
 ): TitleBlockLayout {
   const { titleBlock, paperSize } = sheetConfig;
 
@@ -84,32 +84,32 @@ export function computeTitleBlockLayout(
   const dtRowH  = 26;
   const bottomH = dtRowH + 3 * btRowH;
 
-  const ownerStampExtraH      = hasOwnerStamp      ? 50 : 0;
-  const structuralStampExtraH = hasStructuralStamp ? 50 : 0;
-  const natOwner      = blockH(titleBlock.ownerDeveloper,     38, true) + ownerStampExtraH;
-  const natStructural = blockH(titleBlock.structuralEngineer, 38, true) + structuralStampExtraH;
-  const natProj       = blockH(titleBlock.projectName,        32);
-  const natMain       = blockH(titleBlock.mainContractor,     32);
-  const natPlumb      = blockH(titleBlock.plumbingContractor, 32);
+  const ownerStampExtraH = hasOwnerStamp ? 50 : 0;
+  const peStampExtraH    = hasPeStamp    ? 50 : 0;
+  const natOwner   = blockH(titleBlock.ownerDeveloper,       38, true) + ownerStampExtraH;
+  const natPe      = blockH(titleBlock.professionalEngineer, 38, true) + peStampExtraH;
+  const natProj    = blockH(titleBlock.projectName,          32);
+  const natMain    = blockH(titleBlock.mainContractor,       32);
+  const natPlumber = blockH(titleBlock.licensedPlumber,      32);
 
   const available = paperH - headerH - bottomH - legendH;
-  const totalNat  = natOwner + natStructural + natProj + natMain + natPlumb;
+  const totalNat  = natOwner + natPe + natProj + natMain + natPlumber;
 
   const scale = totalNat > available ? available / totalNat : 1;
   const bonus = totalNat < available ? (available - totalNat) / 5 : 0;
 
-  const ownerH      = Math.round(natOwner      * scale + bonus);
-  const structuralH = Math.round(natStructural * scale + bonus);
-  const projH       = Math.round(natProj       * scale + bonus);
-  const mainH       = Math.round(natMain       * scale + bonus);
-  const plumbH      = available - ownerH - structuralH - projH - mainH;
+  const ownerH   = Math.round(natOwner * scale + bonus);
+  const peH      = Math.round(natPe    * scale + bonus);
+  const projH    = Math.round(natProj  * scale + bonus);
+  const mainH    = Math.round(natMain  * scale + bonus);
+  const plumberH = available - ownerH - peH - projH - mainH;
 
   const yOwner      = headerH;
-  const yStructural = yOwner      + ownerH;
-  const yProj       = yStructural + structuralH;
+  const yPe         = yOwner      + ownerH;
+  const yProj       = yPe         + peH;
   const yMain       = yProj       + projH;
-  const yPlumb      = yMain       + mainH;
-  const yLegend     = yPlumb      + plumbH;
+  const yPlumber    = yMain       + mainH;
+  const yLegend     = yPlumber    + plumberH;
   const yBottom     = paperH      - bottomH;
   const yDt         = yBottom;
   const yRow1       = yDt   + dtRowH;
@@ -122,9 +122,9 @@ export function computeTitleBlockLayout(
 
   return {
     paperW, paperH, tbW, tbX, headerH,
-    ownerStampExtraH, structuralStampExtraH,
-    ownerH, structuralH, projH, mainH, plumbH,
-    yOwner, yStructural, yProj, yMain, yPlumb,
+    ownerStampExtraH, peStampExtraH,
+    ownerH, peH, projH, mainH, plumberH,
+    yOwner, yPe, yProj, yMain, yPlumber,
     legendCols, legendRows, legendH, yLegend,
     bottomH, btRowH, dtRowH, yDt, yRow1, yRow2, yRow3,
     c1W, c2W, c3W,

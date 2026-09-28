@@ -3,7 +3,7 @@ import { Stage, Layer, Rect as KonvaRect } from 'react-konva';
 import Konva from 'konva';
 import { GridLayer } from './GridLayer';
 import { TitleBlockLayer } from './TitleBlockLayer';
-import { LpPeStampLayer } from './LpPeStampLayer';
+import { LpStampLayer } from './LpStampLayer';
 import { ElementsLayer } from './ElementsLayer';
 import { AnnotationsLayer } from './AnnotationsLayer';
 import { AnnotationContextMenu } from './AnnotationContextMenu';
@@ -29,6 +29,7 @@ import { inferFluidAtPoint } from '../../utils/fluidInference';
 import { SYMBOL_PORTS, rotateOffset, getScaledPortOffset, getPortPosition, getEffectivePortRole, getElementPorts, DUAL_SUPPLY_SYMBOLS } from '../../utils/symbolPorts';
 import { renderPdfPageToDataUrl } from '../../utils/pdfRenderer';
 import { exportSchematicToPdf } from '../../utils/pdfVectorExport';
+import { getMissingTitleBlockFields } from '../../utils/titleBlockRequirements';
 
 const SNAP_THRESHOLD = 4;
 const SNAP_T_MIN = 0.02;
@@ -343,6 +344,13 @@ export function DrawingCanvas({ onSizeChange }: DrawingCanvasProps) {
   // vector commands (lines, text, SVG-derived symbol paths) instead of rasterizing the stage.
   useEffect(() => {
     registerExportPdf(() => {
+      const ui = useUiStore.getState();
+      const missing = getMissingTitleBlockFields(ui.sheetConfig.titleBlock);
+      if (missing.length > 0) {
+        alert(`Cannot export PDF — please fill in these title block fields first:\n\n• ${missing.join('\n• ')}`);
+        ui.openSheetSetupAtTitleBlock();
+        return;
+      }
       exportSchematicToPdf(virtualWidth, virtualHeight).catch((err) => {
         console.error('PDF export failed:', err);
       });
@@ -1548,7 +1556,7 @@ export function DrawingCanvas({ onSizeChange }: DrawingCanvasProps) {
           sheetConfig={sheetConfig}
           onTitleBlockClick={() => useUiStore.getState().openSheetSetupAtTitleBlock()}
         />
-        <LpPeStampLayer sheetConfig={sheetConfig} />
+        <LpStampLayer sheetConfig={sheetConfig} />
         <ElementsLayer
           stageScale={stageScale}
           stageOffsetX={stageOffsetX}

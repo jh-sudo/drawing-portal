@@ -24,13 +24,13 @@ export function TitleBlockLayer({ sheetConfig, onTitleBlockClick }: Props) {
     img.src = titleBlock.ownerStamp;
   }, [titleBlock.ownerStamp]);
 
-  const [structuralStampImg, setStructuralStampImg] = useState<HTMLImageElement | null>(null);
+  const [peStampImg, setPeStampImg] = useState<HTMLImageElement | null>(null);
   useEffect(() => {
-    if (!titleBlock.structuralEngineerStamp) { setStructuralStampImg(null); return; }
+    if (!titleBlock.peStamp) { setPeStampImg(null); return; }
     const img = new window.Image();
-    img.onload = () => setStructuralStampImg(img);
-    img.src = titleBlock.structuralEngineerStamp;
-  }, [titleBlock.structuralEngineerStamp]);
+    img.onload = () => setPeStampImg(img);
+    img.src = titleBlock.peStamp;
+  }, [titleBlock.peStamp]);
 
   // ── Legend: unique symbols on canvas ──────────────────────────
   const elements = useCanvasStore((s) => s.elements);
@@ -64,14 +64,14 @@ export function TitleBlockLayer({ sheetConfig, onTitleBlockClick }: Props) {
   }, [symbolKey]);
 
   const layout = useMemo(
-    () => computeTitleBlockLayout(sheetConfig, uniqueSymbols.length, !!ownerStampImg, !!structuralStampImg),
-    [sheetConfig, uniqueSymbols.length, ownerStampImg, structuralStampImg],
+    () => computeTitleBlockLayout(sheetConfig, uniqueSymbols.length, !!ownerStampImg, !!peStampImg),
+    [sheetConfig, uniqueSymbols.length, ownerStampImg, peStampImg],
   );
   const {
     paperH, tbW, tbX, headerH,
-    ownerStampExtraH, structuralStampExtraH,
-    ownerH, structuralH, projH, mainH, plumbH,
-    yOwner, yStructural, yProj, yMain, yPlumb,
+    ownerStampExtraH, peStampExtraH,
+    ownerH, peH, projH, mainH, plumberH,
+    yOwner, yPe, yProj, yMain, yPlumber,
     legendCols: LEGEND_COLS, legendH, yLegend,
     btRowH, dtRowH, yDt, yRow1, yRow2, yRow3,
     c1W, c2W, c3W, borderWidth: bw,
@@ -135,12 +135,12 @@ export function TitleBlockLayer({ sheetConfig, onTitleBlockClick }: Props) {
       <Text x={tbX + PAD} y={yOwner + ownerH - 13}
             text="SIGN :" fontSize={LBL_SZ} fill={LBL_CLR} listening={false} />
 
-      {/* ═══ STRUCTURAL ENGINEER ═════════════════════════════════ */}
-      <Rect x={tbX} y={yStructural} width={tbW} height={structuralH}
+      {/* ═══ PROFESSIONAL ENGINEER ═══════════════════════════════ */}
+      <Rect x={tbX} y={yPe} width={tbW} height={peH}
             fill="#fff" stroke={BORDER} strokeWidth={bw} listening={false} />
-      {BlockText(tbX, yStructural, 'STRUCTURAL ENGINEER :', titleBlock.structuralEngineer)}
-      {renderStamp(structuralStampImg, structuralStampExtraH, yStructural, structuralH, 'structural-stamp')}
-      <Text x={tbX + PAD} y={yStructural + structuralH - 13}
+      {BlockText(tbX, yPe, 'PROFESSIONAL ENGINEER :', titleBlock.professionalEngineer)}
+      {renderStamp(peStampImg, peStampExtraH, yPe, peH, 'pe-stamp')}
+      <Text x={tbX + PAD} y={yPe + peH - 13}
             text="SIGN :" fontSize={LBL_SZ} fill={LBL_CLR} listening={false} />
 
       {/* ═══ PROJECT TITLE ════════════════════════════════════════ */}
@@ -153,10 +153,10 @@ export function TitleBlockLayer({ sheetConfig, onTitleBlockClick }: Props) {
             fill="#fff" stroke={BORDER} strokeWidth={bw} listening={false} />
       {BlockText(tbX, yMain, 'MAIN CON :', titleBlock.mainContractor)}
 
-      {/* ═══ PLUMBING CONTRACTOR ══════════════════════════════════ */}
-      <Rect x={tbX} y={yPlumb} width={tbW} height={plumbH}
+      {/* ═══ LICENSED PLUMBER ═════════════════════════════════════ */}
+      <Rect x={tbX} y={yPlumber} width={tbW} height={plumberH}
             fill="#fff" stroke={BORDER} strokeWidth={bw} listening={false} />
-      {BlockText(tbX, yPlumb, 'PLUMBING CONTRACTOR', titleBlock.plumbingContractor)}
+      {BlockText(tbX, yPlumber, 'LICENSED PLUMBER', titleBlock.licensedPlumber)}
 
       {/* ═══ LEGEND ══════════════════════════════════════════════ */}
       {legendH > 0 && (
